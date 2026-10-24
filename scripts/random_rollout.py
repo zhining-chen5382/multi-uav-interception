@@ -6,6 +6,7 @@ import json
 import numpy as np
 
 from envs.pursuit_env import DEFAULT_CONFIG, PursuitEnv
+from utils.evaluation import episode_outcome
 
 
 def main():
@@ -28,6 +29,9 @@ def main():
         episode_reward = 0.0
         min_distance = info["min_distance"]
         collision_steps = 0
+        evader_boundary_steps = 0
+        consecutive_boundary_steps = 0
+        max_consecutive_boundary_steps = 0
         terminated = truncated = False
         while not (terminated or truncated):
             observations, rewards, terminated, truncated, info = env.step(env.sample_actions())
@@ -37,15 +41,37 @@ def main():
             episode_reward += float(rewards[0])
             min_distance = min(min_distance, info["min_distance"])
             collision_steps += int(info["collision_pairs"] > 0)
+            # Count exact boundary occupancy separately from actual hard clips:
+            # a stationary aircraft can remain on a face without a new clip.
+            on_boundary = bool(np.any(
+                (env.states[-1, :3] <= env.bounds_low) | (env.states[-1, :3] >= env.bounds_high)
+            ))
+            evader_boundary_steps += int(on_boundary)
+            consecutive_boundary_steps = consecutive_boundary_steps + 1 if on_boundary else 0
+            max_consecutive_boundary_steps = max(max_consecutive_boundary_steps, consecutive_boundary_steps)
         print(json.dumps({
             "episode": episode + 1,
             "seed": episode_seed,
             "steps": env.step_count,
-            "captured": terminated,
+            "captured": info["captured"],
+            "interception_success": info["interception_success"],
+            "attacker_reached_base": info["attacker_reached_base"],
+            "enemy_attack_success": info["enemy_attack_success"],
+            "interception_failure": info["interception_failure"],
+            "outcome": episode_outcome(info, truncated),
+            "distance_to_base": info["distance_to_base"],
+            "interception_time": env.step_count * env.dt if info["captured"] else None,
             "truncated": truncated,
             "episode_reward": episode_reward,
             "min_distance": min_distance,
             "collision_steps": collision_steps,
+            "boundary_steering_enabled": info["boundary_steering_enabled"],
+            "boundary_clip_count": info["boundary_clip_count"],
+            "boundary_clip_counts": info["boundary_clip_counts"].tolist(),
+            "evader_boundary_clip_count": int(info["boundary_clip_counts"][-1]),
+            "attacker_boundary_clip_count": int(info["boundary_clip_counts"][-1]),
+            "evader_boundary_steps": evader_boundary_steps,
+            "evader_max_consecutive_boundary_steps": max_consecutive_boundary_steps,
         }))
 
 

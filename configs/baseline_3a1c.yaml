@@ -4,23 +4,30 @@ environment:
   num_evaders: 1
   dt: 0.1
   max_episode_steps: 500
-  # Provisional bounded workspace, in metres. Clamp positions at the boundary.
+  # Numerical workspace only: not battlefield walls or a terrain model.
+  # Covers the 500 m detection sphere with 250 m clearance on every axis.
   bounds:
-    low: [-100.0, -100.0, 0.0]
-    high: [100.0, 100.0, 100.0]
+    low: [-750.0, -750.0, -750.0]
+    high: [750.0, 750.0, 750.0]
+
+mission:
+  base_position: [0.0, 0.0, 0.0]
+  detection_radius: 500.0
+  attack_radius: 10.0
 
 # Fixed, simple initial conditions; no random formation or observation noise.
 initialization:
   pursuer_positions:
-    - [-30.0, -10.0, 50.0]
-    - [-30.0, 0.0, 50.0]
-    - [-30.0, 10.0, 50.0]
-  evader_position: [0.0, 0.0, 50.0]
+    - [1.5, 0.0, 1.0]
+    - [-0.75, 1.25, 1.0]
+    - [-0.75, -1.25, 1.0]
+  # sqrt(500^2 - 50^2) on x: exactly 500 m from the defended point.
+  attacker_position: [497.49371855331, 0.0, 50.0]
   pursuer_velocities:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 0.0]
-  evader_velocity: [0.0, 0.0, 0.0]
+  attacker_velocity: [0.0, 0.0, 0.0]
 
 pursuer:
   max_horizontal_speed: 20.0
@@ -30,8 +37,8 @@ pursuer:
   max_vertical_acceleration: 2.0
   max_jerk: 5.0
 
-# Provisional defaults: the evader initially has the same limits as pursuers.
-evader:
+# Same physical capabilities as the previous evader; only its mission changes.
+attacker:
   max_horizontal_speed: 20.0
   max_climb_speed: 8.0
   max_descent_speed: 6.0
@@ -39,7 +46,12 @@ evader:
   max_vertical_acceleration: 2.0
   max_jerk: 5.0
   policy:
+    mode: direct
+    attack_speed: 20.0
+    # Provisional 1/s gain: a one-second unconstrained velocity-error time constant.
+    velocity_gain: 1.0
     distance_epsilon: 0.000001
+    # No pursuer avoidance, arrival braking or soft boundary steering in direct mode.
 
 safety:
   pursuer_safety_distance: 2.0
@@ -49,6 +61,7 @@ capture:
 
 reward:
   capture_reward: 100.0
+  attack_failure_penalty: -100.0
   time_penalty: -0.01
   collision_penalty: -5.0
   progress_coefficient: 1.0

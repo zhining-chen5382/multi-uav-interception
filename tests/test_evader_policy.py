@@ -8,9 +8,9 @@ from envs.evader_policy import RepulsiveEvaderPolicy
 
 
 @pytest.fixture
-def policy(baseline_config):
-    limits = MotionLimits.from_config(baseline_config["evader"])
-    return RepulsiveEvaderPolicy(limits, baseline_config["evader"]["policy"]["distance_epsilon"])
+def policy(legacy_config):
+    limits = MotionLimits.from_config(legacy_config["evader"])
+    return RepulsiveEvaderPolicy(limits, legacy_config["evader"]["policy"]["distance_epsilon"])
 
 
 def test_evader_accelerates_away_from_pursuers(policy):
@@ -41,8 +41,8 @@ def test_symmetric_and_coincident_states_have_no_nan(policy):
     np.testing.assert_allclose(coincident, np.zeros(3))
 
 
-def test_policy_obeys_custom_acceleration_parameters(baseline_config):
-    values = dict(baseline_config["evader"])
+def test_policy_obeys_custom_acceleration_parameters(legacy_config):
+    values = dict(legacy_config["evader"])
     values.update(max_horizontal_acceleration=1.2, max_vertical_acceleration=0.7)
     policy = RepulsiveEvaderPolicy(MotionLimits.from_config(values), 1e-6)
     pursuers = np.array([[-1.0, 0.0, -1.0, 0.0, 0.0, 0.0]] * 3)
