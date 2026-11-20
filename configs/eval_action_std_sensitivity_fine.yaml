@@ -1,0 +1,24 @@
+checkpoint: outputs/v08_捕获奖励500/v08-r01_20261108_seed000/checkpoints/update_000180.pt
+expected_checkpoint_sha256: d5d78f3045a2bb9d865028182db21a7128603e02d890cef5dfcabd0ed97609cd
+expected_env_steps: 92160
+reference_environment_config: configs/baseline_capture500.yaml
+reference_trajectory: outputs/v08_捕获奖励500/v08-r01_20261108_seed000/evaluation/screened_success/first_episode.npz
+output_dir: outputs/v12_ActionStd敏感性/std_sensitivity_fine_20261110_seed1000
+episodes_per_group: 100
+base_seed: 1000
+groups:
+  - name: std_0
+    multiplier: 0.0
+  - name: std_005
+    multiplier: 0.05
+  - name: std_010
+    multiplier: 0.10
+  - name: std_015
+    multiplier: 0.15
+  - name: std_020
+    multiplier: 0.20
+  - name: std_025
+    multiplier: 0.25
+representative_selection: lower_median_min_distance
+visualization:
+  dpi: 160

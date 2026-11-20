@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "record_date": "2026-11-08",
+  "mappings": {
+    "outputs/v01": "outputs/v01_旧追逃实验",
+    "outputs/v02": "outputs/v02_边界机制验证",
+    "outputs/v03": "outputs/v03_GoalDirected点防御",
+    "outputs/v04": "outputs/v04_DirectAttacker_旧奖励",
+    "outputs/v05": "outputs/v05_ActiveProgress奖励",
+    "outputs/v06": "outputs/v06_输入归一化",
+    "outputs/_project": "outputs/_project_项目核对与管理资料"
+  },
+  "version_ids_unchanged": true,
+  "run_ids_unchanged": true,
+  "training_authorized_this_turn": false
+}

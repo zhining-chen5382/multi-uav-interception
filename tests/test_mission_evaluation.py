@@ -60,6 +60,30 @@ def test_evaluation_preserves_three_task_outcomes(tmp_path, outcome, title):
     assert trajectory["positions"].shape == (2, 4, 3)
     np.testing.assert_allclose(trajectory["distance_to_base"][-1], metrics["attacker_base_terminal_distance"])
     assert np.isfinite(trajectory["states"]).all()
+    component_names = trajectory["reward_component_names"].tolist()
+    components = trajectory["reward_components"]
+    assert components.shape == (1, len(component_names))
+    assert np.isfinite(components).all()
+    weighted_names = ("active_progress_reward", "survival", "collision", "capture", "attack_failure")
+    weighted_indices = [component_names.index(name) for name in weighted_names]
+    np.testing.assert_allclose(components[:, weighted_indices].sum(axis=1), trajectory["rewards"])
+    assert metrics["cumulative_active_progress_reward"] == pytest.approx(
+        components[:, component_names.index("active_progress_reward")].sum()
+    )
+    assert metrics["cumulative_survival_penalty"] == pytest.approx(
+        components[:, component_names.index("survival")].sum()
+    )
+    assert metrics["cumulative_collision_penalty"] == pytest.approx(
+        components[:, component_names.index("collision")].sum()
+    )
+    assert metrics["terminal_reward"] == pytest.approx(
+        components[:, [component_names.index("capture"),
+                       component_names.index("attack_failure")]].sum()
+    )
+    assert sum(metrics[name] for name in (
+        "cumulative_active_progress_reward", "cumulative_survival_penalty",
+        "cumulative_collision_penalty", "terminal_reward",
+    )) == pytest.approx(metrics["episode_reward"])
     summary = summarize_episodes([metrics])
     assert summary["interception_success_rate"] == float(outcome == "interception")
     assert summary["enemy_attack_success_rate"] == float(outcome == "enemy")
@@ -87,6 +111,13 @@ def test_enemy_terminal_is_logged_as_failure_and_does_not_bootstrap(tmp_path):
     assert len(rows) == 2
     assert all(row["captured"] == "0" and row["enemy_attack_success"] == "1" for row in rows)
     assert all(row["outcome"] == "Enemy Attack Success" and row["capture_time"] == "" for row in rows)
+    for row in rows:
+        assert float(row["terminal_reward"]) == -100.0
+        assert float(row["cumulative_survival_penalty"]) == pytest.approx(-0.02)
+        assert sum(float(row[name]) for name in (
+            "cumulative_active_progress_reward", "cumulative_survival_penalty",
+            "cumulative_collision_penalty", "terminal_reward",
+        )) == pytest.approx(float(row["episode_reward"]))
     with (output / "updates.csv").open(encoding="utf-8", newline="") as stream:
         update = next(csv.DictReader(stream))
     assert float(update["capture_rate"]) == 0.0

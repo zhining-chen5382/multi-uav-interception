@@ -1,0 +1,17 @@
+checkpoint: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/checkpoints/best.pt
+expected_checkpoint_steps: 310000
+expected_checkpoint_sha256: 95f3ee35a1be51cba15e951115b552944b09284101f43f1d2ee7f9e010eecc0e
+final_checkpoint: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/checkpoints/final.pt
+expected_final_checkpoint_steps: 500000
+expected_final_checkpoint_sha256: 6e687cf1656c1d41da9c63da7186fe1a67da138a88b9eff3512568f593c1b9bc
+output_dir: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/全圆方向测试
+angle_low_degrees: -180.0
+angle_high_exclusive_degrees: 180.0
+coarse_step_degrees: 1.0
+refinement_step_degrees: 0.1
+sector_width_degrees: 30.0
+environment_seed_base: 4101
+refinement_seed_base: 5101
+video_angle_degrees: -45.0
+representative_angles_degrees: [-30.0, -45.0, -60.0, -90.0]
+torch_num_threads: 1

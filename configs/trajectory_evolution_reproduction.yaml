@@ -1,0 +1,2 @@
+# Include the actual v08 success checkpoints in this independent verification.
+extra_checkpoint_steps: [92160, 97280]

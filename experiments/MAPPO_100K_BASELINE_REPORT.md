@@ -1,6 +1,8 @@
 # Baseline v1：单次 100000 步 MAPPO 正式实验
 
-日期：2026-10-24。输出目录：`outputs/formal_run_100k/`。
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
+日期：2026-10-24。输出目录：`outputs/v01_旧追逃实验/v01-r03_20261024_seed000/`。
 
 ## 1. 实验目的与结论
 
@@ -68,7 +70,7 @@ env_config: baseline_3a1c.yaml
 seed: 0
 device: cpu
 torch_num_threads: 1
-output_dir: outputs/formal_run_100k
+output_dir: outputs/v01_旧追逃实验/v01-r03_20261024_seed000
 training:
   total_env_steps: 100000
   rollout_steps: 512
@@ -121,7 +123,7 @@ visualization:
 实际执行且进程正常退出：
 
 ```powershell
-.\.venv\Scripts\python.exe -u -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 100000 --output-dir outputs/formal_run_100k
+.\.venv\Scripts\python.exe -u -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 100000 --output-dir outputs/v01_旧追逃实验/v01-r03_20261024_seed000
 ```
 
 | 项目 | 实测 |
@@ -210,7 +212,7 @@ entropy 与 KL 排除行为层面的失败模式。
 实际执行：
 
 ```powershell
-.\.venv\Scripts\python.exe -u -m scripts.evaluate_mappo --checkpoint outputs/formal_run_100k/checkpoints/final.pt --episodes 50 --output-dir outputs/formal_run_100k/evaluation/final
+.\.venv\Scripts\python.exe -u -m scripts.evaluate_mappo --checkpoint outputs/v01_旧追逃实验/v01-r03_20261024_seed000/checkpoints/final.pt --episodes 50 --output-dir outputs/v01_旧追逃实验/v01-r03_20261024_seed000/evaluation/final
 ```
 
 50 回合、seeds 1000–1049、确定性动作，0 次捕获，全部在 500 步超时。
@@ -225,7 +227,7 @@ entropy 与 KL 排除行为层面的失败模式。
 实际执行：
 
 ```powershell
-.\.venv\Scripts\python.exe -u -m scripts.evaluate_mappo --checkpoint outputs/formal_run_100k/checkpoints/best.pt --episodes 50 --output-dir outputs/formal_run_100k/evaluation/best
+.\.venv\Scripts\python.exe -u -m scripts.evaluate_mappo --checkpoint outputs/v01_旧追逃实验/v01-r03_20261024_seed000/checkpoints/best.pt --episodes 50 --output-dir outputs/v01_旧追逃实验/v01-r03_20261024_seed000/evaluation/best
 ```
 
 50 回合、seeds 1000–1049、确定性动作，0 次捕获，全部在 500 步超时。
@@ -286,20 +288,20 @@ best 的终态距离比 final 小，但有碰撞惩罚，所以回报反而略�
 capture rate 使用 CSV 原有最多 **50 个完整回合**窗口，不再次平滑。
 min distance 图同时显示终态最近距离，以免初始距离形成的平线被误读。
 
-![真实 100k 训练总览](../outputs/formal_run_100k/plots/training_overview.png)
+![真实 100k 训练总览](../outputs/v01_旧追逃实验/v01-r03_20261024_seed000/plots/training_overview.png)
 
 分别实际调用 `scripts.visualize_mappo` 加载 final/best，输出目录与相应评估相同。
 两张图均已视觉检查，标明 P0/P1/P2/evader、start/end、米制坐标轴、图例、
 captured=False 与 500 steps。`trajectory.npz` 保存初始状态及全部 500 步轨迹。
 
-![Final 3D trajectory](../outputs/formal_run_100k/evaluation/final/trajectory_3d.png)
+![Final 3D trajectory](../outputs/v01_旧追逃实验/v01-r03_20261024_seed000/evaluation/final/trajectory_3d.png)
 
-![Best 3D trajectory](../outputs/formal_run_100k/evaluation/best/trajectory_3d.png)
+![Best 3D trajectory](../outputs/v01_旧追逃实验/v01-r03_20261024_seed000/evaluation/best/trajectory_3d.png)
 
 补充的完整回合视频（直接从上述已保存轨迹渲染，没有重跑或修改仿真）：
 
-- [Final model 完整视频](../outputs/formal_run_100k/videos/final_full_episode.mp4)
-- [Best model 完整视频](../outputs/formal_run_100k/videos/best_full_episode.mp4)
+- [Final model 完整视频](../outputs/v01_旧追逃实验/v01-r03_20261024_seed000/videos/final_full_episode.mp4)
+- [Best model 完整视频](../outputs/v01_旧追逃实验/v01-r03_20261024_seed000/videos/best_full_episode.mp4)
 
 两份均为 1280×720 H.264 MP4、10 fps、1 倍速，保留原始全部 501 个状态帧，
 覆盖 0–50 s 的 500 步仿真；因包含初始帧，文件播放时长为 50.1 s。
@@ -403,7 +405,7 @@ P1 明显脱离。但 final 的终态最近机反而是 P1，说明整个回合�
 
 ## 结果文件索引
 
-- 训练原始数据：`outputs/formal_run_100k/training_metrics.csv`、`updates.csv`。
+- 训练原始数据：`outputs/v01_旧追逃实验/v01-r03_20261024_seed000/training_metrics.csv`、`updates.csv`。
 - 配置、来源与核验：同目录 `preflight.json`、`metadata.json`、`postflight_audit.json`、
   `source_snapshot/`、`training_console.log`。
 - 全过程统计：`training_analysis.json`、`training_phase_summary.csv`。

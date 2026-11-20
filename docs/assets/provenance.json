@@ -1,0 +1,32 @@
+{
+  "prepared_on": "2026-11-20",
+  "experiment": "v16 line-cost k=0.1 Seed1001 continuation to 500k",
+  "no_new_training": true,
+  "no_new_inference": true,
+  "assets": [
+    {
+      "asset": "docs/assets/trajectory-evolution-v16.png",
+      "source": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/00_图表总览/04_500k_Seed1001续训密集轨迹演化.png",
+      "sha256": "eddd062ad907d0bb02d2ad533760ee5b1c8ea9dfe60739061212646f42eec32c",
+      "bytes": 197986,
+      "scope": "v16 Seed1001; checkpoints 0–500k; fixed deterministic 0-degree scenario; XY projection; 124 actual policies",
+      "transformation": "byte-for-byte copy; no resampling, smoothing, cropping or image editing"
+    },
+    {
+      "asset": "docs/assets/training-capture-reward-v16.png",
+      "source": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/00_图表总览/06_500k_续训捕获率与Reward.png",
+      "sha256": "6dd32fd7569eb57185a14fe111d9a41057f2cb720a3409988ec39f277e142023",
+      "bytes": 450098,
+      "scope": "v16 Seed1001; 0–500k; training rewards and fixed 100-angle validation in [-30,+30] degrees; 300k continuation marked",
+      "transformation": "byte-for-byte copy; no resampling, smoothing, cropping or image editing"
+    },
+    {
+      "asset": "docs/assets/actor-critic-loss-v16.png",
+      "source": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/postprocessing_001/plots/actor_critic_loss.png",
+      "sha256": "f3287d5d562c7551b2bbf17455ac20e4d62aa7189befd0b9625d2a30b5d4587c",
+      "bytes": 153851,
+      "scope": "v16 Seed1001; recorded Actor and Critic loss; PPO updates 1–123; training 0–500k",
+      "transformation": "byte-for-byte copy; no resampling, smoothing, cropping or image editing"
+    }
+  ]
+}

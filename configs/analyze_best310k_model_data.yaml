@@ -1,0 +1,21 @@
+checkpoint: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/checkpoints/best.pt
+expected_checkpoint_sha256: 95f3ee35a1be51cba15e951115b552944b09284101f43f1d2ee7f9e010eecc0e
+source_snapshot: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/source_snapshot
+output_dir: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/负29至负5度独立测试/model_dossier_speed_20261119
+datasets:
+  - name: selected_neg29_neg5
+    label: 独立负角域 −29°至−5°（500回合）
+    root: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/负29至负5度独立测试/random_500
+    expected_episodes: 500
+    expected_captures: 500
+  - name: original_minus30_plus30
+    label: 原始全测试域 −30°至+30°（500回合）
+    root: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/best_test
+    expected_episodes: 500
+    expected_captures: 233
+horizontal_speed_threshold_fractions: [0.1, 0.15, 0.2, 0.5, 0.75, 0.9, 0.95, 0.99, 1.0]
+limit_tolerance: 1.0e-8
+numerical_replay_tolerance: 2.0e-5
+speed_histogram_bin_width: 0.25
+font_family: Microsoft YaHei
+dpi: 190

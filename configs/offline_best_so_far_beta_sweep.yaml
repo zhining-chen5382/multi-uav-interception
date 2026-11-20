@@ -1,0 +1,5 @@
+source_analysis: outputs/formal_ppo_v1/_离线奖励标定/02_历史最小距离差分
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/03_历史距离beta标定
+lambda_m: 20.0
+betas: [60.0, 80.0, 100.0]
+failure_shaping_soft_limit: 80.0

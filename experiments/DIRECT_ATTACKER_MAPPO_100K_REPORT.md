@@ -1,6 +1,8 @@
 # Direct Attacker：MAPPO 100k 正式基线实验
 
-实验日期：2026-10-25（Asia/Shanghai）。输出目录：`outputs/direct_attacker_100k/`。
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
+实验日期：2026-10-25（Asia/Shanghai）。输出目录：`outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/`。
 
 **结论：Not learned。** 单次从零训练完整完成 100000 个环境步；训练期间 354 个完整回合均未拦截。Final 与 best 各实际执行 100 个确定性评估回合，拦截率均为 0%，敌方攻击成功率均为 100%；本次重新运行的 100 回合 random 对照拦截率为 2%。训练回报总体下降，没有证据表明现有 MAPPO 已学会点防御拦截。
 
@@ -13,10 +15,10 @@
 ## 2. 代码版本与训练前检查
 
 - Git HEAD：`23bf55576cca27944b4ee2ae5c53a70295c7dac3`。
-- 开始实验时工作区已存在未提交改动，因此该 hash 不能单独代表本次实际代码。已将实际使用的 40 个源码、配置、测试和定义文件保存至 [source_snapshot](../outputs/direct_attacker_100k/source_snapshot/)，逐文件 SHA256 与初始 Git status 见 [freeze_manifest.json](../outputs/direct_attacker_100k/freeze_manifest.json)。训练后复核这 40 个文件字节未变。
+- 开始实验时工作区已存在未提交改动，因此该 hash 不能单独代表本次实际代码。已将实际使用的 40 个源码、配置、测试和定义文件保存至 [source_snapshot](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/source_snapshot/)，逐文件 SHA256 与初始 Git status 见 [freeze_manifest.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/freeze_manifest.json)。训练后复核这 40 个文件字节未变。
 - 训练前完整 pytest：**203 passed in 13.52s**。使用 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` 排除本机第三方 pytest 插件干扰；Matplotlib 使用 `Agg`。
 - 运行环境：Python 3.8.8、NumPy 1.24.4、PyTorch 2.4.1+cpu、PyYAML 6.0.3、Matplotlib 3.7.5、pytest 8.3.5；CPU，Torch 单线程。
-- 新运行的 Direct Attacker sanity check 通过：初始距基地 500.000 m，第 281 步为 10.261147 m，第 282 步进入攻击球，距离 8.261147 m，耗时 28.2 s。进入时速度约 20.000 m/s，距基地没有增加的步，无 hard clipping、无超时，数值及物理约束均通过检查。见 [sanity metrics](../outputs/direct_attacker_100k/preflight/sanity/metrics.json) 和 [sanity 原始轨迹](../outputs/direct_attacker_100k/preflight/sanity/trajectory.npz)。
+- 新运行的 Direct Attacker sanity check 通过：初始距基地 500.000 m，第 281 步为 10.261147 m，第 282 步进入攻击球，距离 8.261147 m，耗时 28.2 s。进入时速度约 20.000 m/s，距基地没有增加的步，无 hard clipping、无超时，数值及物理约束均通过检查。见 [sanity metrics](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/preflight/sanity/metrics.json) 和 [sanity 原始轨迹](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/preflight/sanity/trajectory.npz)。
 
 实际执行的主要命令如下。仅明确传入既定 100000 步和专用输出目录，没有覆盖任何研究超参数；正式评估按本次要求将回合数从配置默认 10 提升为 100。
 
@@ -24,21 +26,21 @@
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = '1'
 $env:MPLBACKEND = 'Agg'
 & .\.venv\Scripts\python.exe -m pytest -q
-& .\.venv\Scripts\python.exe -m scripts.sanity_direct_attacker --config configs/baseline_3a1c.yaml --output-dir outputs/direct_attacker_100k/preflight/sanity
-& .\.venv\Scripts\python.exe -u -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 100000 --output-dir outputs/direct_attacker_100k
-& .\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/direct_attacker_100k/checkpoints/final.pt --episodes 100 --output-dir outputs/direct_attacker_100k/evaluation/final
-& .\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/direct_attacker_100k/checkpoints/best.pt --episodes 100 --output-dir outputs/direct_attacker_100k/evaluation/best
-& .\.venv\Scripts\python.exe outputs/direct_attacker_100k/analysis_scripts/evaluate_random.py --config configs/mappo_baseline.yaml --episodes 100 --seed 1000 --output-dir outputs/direct_attacker_100k/evaluation/random
+& .\.venv\Scripts\python.exe -m scripts.sanity_direct_attacker --config configs/baseline_3a1c.yaml --output-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/preflight/sanity
+& .\.venv\Scripts\python.exe -u -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 100000 --output-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000
+& .\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/checkpoints/final.pt --episodes 100 --output-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/final
+& .\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/checkpoints/best.pt --episodes 100 --output-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/best
+& .\.venv\Scripts\python.exe outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/evaluate_random.py --config configs/mappo_baseline.yaml --episodes 100 --seed 1000 --output-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/random
 ```
 
-训练 stdout/stderr 保留于 [training_console.log](../outputs/direct_attacker_100k/training_console.log)；完整核验结果见 [experiment_verification.json](../outputs/direct_attacker_100k/experiment_verification.json)。
+训练 stdout/stderr 保留于 [training_console.log](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/training_console.log)；完整核验结果见 [experiment_verification.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/experiment_verification.json)。
 
 已有数据的训练曲线、3D 图和输入诊断可通过以下分析命令重新生成，无需再训练：
 
 ```powershell
-& .\.venv\Scripts\python.exe outputs/direct_attacker_100k/analysis_scripts/analyze_training.py --run-dir outputs/direct_attacker_100k
-& .\.venv\Scripts\python.exe outputs/direct_attacker_100k/analysis_scripts/analyze_behavior.py --run-dir outputs/direct_attacker_100k
-& .\.venv\Scripts\python.exe outputs/direct_attacker_100k/analysis_scripts/analyze_input_activation.py
+& .\.venv\Scripts\python.exe outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/analyze_training.py --run-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000
+& .\.venv\Scripts\python.exe outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/analyze_behavior.py --run-dir outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000
+& .\.venv\Scripts\python.exe outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/analyze_input_activation.py
 ```
 
 ## 3. Task definition
@@ -51,7 +53,7 @@ $env:MPLBACKEND = 'Agg'
 
 ## 4. 全部环境关键参数
 
-配置原件为 `configs/baseline_3a1c.yaml`；实际运行副本见 [environment_config.yaml](../outputs/direct_attacker_100k/environment_config.yaml)，训练前副本见 [environment_parameters.yaml](../outputs/direct_attacker_100k/preflight/environment_parameters.yaml)。
+配置原件为 `configs/baseline_3a1c.yaml`；实际运行副本见 [environment_config.yaml](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/environment_config.yaml)，训练前副本见 [environment_parameters.yaml](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/preflight/environment_parameters.yaml)。
 
 | 参数 | 实际值 |
 | --- | --- |
@@ -80,12 +82,12 @@ $env:MPLBACKEND = 'Agg'
 
 ## 5. 全部 MAPPO 超参数
 
-原配置为 `configs/mappo_baseline.yaml`；实际生效的完整参数见 [training_config.yaml](../outputs/direct_attacker_100k/training_config.yaml)，与训练前 [effective_training_parameters.yaml](../outputs/direct_attacker_100k/preflight/effective_training_parameters.yaml) 一致。
+原配置为 `configs/mappo_baseline.yaml`；实际生效的完整参数见 [training_config.yaml](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/training_config.yaml)，与训练前 [effective_training_parameters.yaml](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/preflight/effective_training_parameters.yaml) 一致。
 
 | 参数 | 实际值 |
 | --- | --- |
 | env_config / seed / device / torch_num_threads | baseline_3a1c.yaml（相对 configs） / 0 / cpu / 1 |
-| output_dir | outputs/direct_attacker_100k（CLI 指定） |
+| output_dir | outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000（CLI 指定） |
 | total_env_steps / rollout_steps | 100000 / 512 |
 | log_interval_updates / checkpoint_interval_updates | 1 / 10 |
 | capture_rate_window | 50 个完整 episodes |
@@ -110,29 +112,29 @@ $env:MPLBACKEND = 'Agg'
 
 实际训练 **100000 环境步、196 次 PPO updates、354 个完整 episodes**；每个完整回合均为 282 步，共 99828 步。余下 172 步属于最后一个未结束回合，未冒充完整 episode。最后一次 rollout 只有 160 步以精确到达 100000。完整回合均为敌方攻击成功，无拦截、无超时。
 
-已保存 19 个每 10 updates 的周期 checkpoint（update 10 至 190），以及 [final.pt](../outputs/direct_attacker_100k/checkpoints/final.pt)、[best.pt](../outputs/direct_attacker_100k/checkpoints/best.pt)，共 21 个；逐一加载核验 actor/critic、optimizer tensor 和保存的环境状态，均有限，无 NaN/Inf。日志中的训练指标均正常记录，所有数值型 CSV 单元均有限。未成功时 capture/interception time 留空或 JSON `null`，没有填为 0。
+已保存 19 个每 10 updates 的周期 checkpoint（update 10 至 190），以及 [final.pt](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/checkpoints/final.pt)、[best.pt](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/checkpoints/best.pt)，共 21 个；逐一加载核验 actor/critic、optimizer tensor 和保存的环境状态，均有限，无 NaN/Inf。日志中的训练指标均正常记录，所有数值型 CSV 单元均有限。未成功时 capture/interception time 留空或 JSON `null`，没有填为 0。
 
 Best 保存于 **update 2 / 1024 steps / 已完成 3 episodes**。原代码按“近期训练拦截率优先，再比较近期平均回报”选取，窗口上限为 50、早期不足 50 时使用已有回合；当时 score=`[0.0,292.4142316248802]`。整个训练捕获率都为零，因此这是早期小样本训练回报启发式选出的 best，既不是按本轮 evaluation 挑选，也不意味着它学会了任务。
 
 ## 7. 训练数据与曲线
 
-原始数据：[training_metrics.csv](../outputs/direct_attacker_100k/training_metrics.csv)（354 行）及 [updates.csv](../outputs/direct_attacker_100k/updates.csv)（196 行）。另保存 [training_data.npz](../outputs/direct_attacker_100k/training_data.npz)、[updates_data.npz](../outputs/direct_attacker_100k/updates_data.npz)，保留全部 CSV 字段及缺失值信息；生成过程和 SHA256 记录于 [training_analysis.json](../outputs/direct_attacker_100k/training_analysis.json)。
+原始数据：[training_metrics.csv](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/training_metrics.csv)（354 行）及 [updates.csv](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/updates.csv)（196 行）。另保存 [training_data.npz](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/training_data.npz)、[updates_data.npz](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/updates_data.npz)，保留全部 CSV 字段及缺失值信息；生成过程和 SHA256 记录于 [training_analysis.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/training_analysis.json)。
 
 Episode 曲线同时画原始值与 **trailing 50 episodes rolling mean**；前 49 个点只使用当时已存在的数据，未填造未来样本。横轴为回合结束时累计环境步。Update 曲线直接展示原始 update 指标，不做平滑。
 
 | 指标 | 图文件 |
 | --- | --- |
-| episode reward | [reward_vs_training_steps.png](../outputs/direct_attacker_100k/plots/reward_vs_training_steps.png) |
-| interception success rate | [interception_rate_vs_training_steps.png](../outputs/direct_attacker_100k/plots/interception_rate_vs_training_steps.png) |
-| enemy attack success rate | [enemy_attack_rate_vs_training_steps.png](../outputs/direct_attacker_100k/plots/enemy_attack_rate_vs_training_steps.png) |
-| episode length | [episode_length_vs_training_steps.png](../outputs/direct_attacker_100k/plots/episode_length_vs_training_steps.png) |
-| minimum pursuer-attacker distance | [min_distance_vs_training_steps.png](../outputs/direct_attacker_100k/plots/min_distance_vs_training_steps.png) |
-| terminal attacker-base distance | [terminal_base_distance_vs_training_steps.png](../outputs/direct_attacker_100k/plots/terminal_base_distance_vs_training_steps.png) |
-| actor loss | [actor_loss_vs_updates.png](../outputs/direct_attacker_100k/plots/actor_loss_vs_updates.png) |
-| critic/value loss | [critic_loss_vs_updates.png](../outputs/direct_attacker_100k/plots/critic_loss_vs_updates.png) |
-| entropy | [entropy_vs_updates.png](../outputs/direct_attacker_100k/plots/entropy_vs_updates.png) |
+| episode reward | [reward_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/reward_vs_training_steps.png) |
+| interception success rate | [interception_rate_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/interception_rate_vs_training_steps.png) |
+| enemy attack success rate | [enemy_attack_rate_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/enemy_attack_rate_vs_training_steps.png) |
+| episode length | [episode_length_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/episode_length_vs_training_steps.png) |
+| minimum pursuer-attacker distance | [min_distance_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/min_distance_vs_training_steps.png) |
+| terminal attacker-base distance | [terminal_base_distance_vs_training_steps.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/terminal_base_distance_vs_training_steps.png) |
+| actor loss | [actor_loss_vs_updates.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/actor_loss_vs_updates.png) |
+| critic/value loss | [critic_loss_vs_updates.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/critic_loss_vs_updates.png) |
+| entropy | [entropy_vs_updates.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/entropy_vs_updates.png) |
 
-同一 [plots 目录](../outputs/direct_attacker_100k/plots/) 还保存 timeout rate、collision steps、approximate KL、clip fraction、actor/critic gradient norm 六张图，共 15 张。图像均基于本次原始 CSV，生成脚本为 [analyze_training.py](../outputs/direct_attacker_100k/analysis_scripts/analyze_training.py)。
+同一 [plots 目录](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/) 还保存 timeout rate、collision steps、approximate KL、clip fraction、actor/critic gradient norm 六张图，共 15 张。图像均基于本次原始 CSV，生成脚本为 [analyze_training.py](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/analyze_training.py)。
 
 ## 8. 整个训练过程的趋势
 
@@ -156,13 +158,13 @@ Pre-clipping critic gradient norm 的五段均值约 168 / 266 / 367 / 459 / 724
 
 ## 9. Final model 正式评估
 
-使用 100000-step `final.pt`，实际执行 100 回合确定性评估（seeds 1000–1099），不从训练回合复用指标。数据位于 [evaluation/final](../outputs/direct_attacker_100k/evaluation/final/)。
+使用 100000-step `final.pt`，实际执行 100 回合确定性评估（seeds 1000–1099），不从训练回合复用指标。数据位于 [evaluation/final](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/final/)。
 
 结果：0/100 拦截、100/100 敌方攻击成功、0/100 timeout；平均 reward 161.7954，长度 282 步 / 28.2 s，平均回合最小敌我距离 58.3119 m，终点最近敌我距离 233.7928 m，终点敌机距基地 8.261147 m。成功拦截时间无样本，保存为 `null`。无我方 collision steps，无 hard clipping。
 
 ## 10. Best model 正式评估
 
-使用 update 2 / 1024-step `best.pt`，同样实际执行 100 回合确定性评估（seeds 1000–1099）。数据位于 [evaluation/best](../outputs/direct_attacker_100k/evaluation/best/)。
+使用 update 2 / 1024-step `best.pt`，同样实际执行 100 回合确定性评估（seeds 1000–1099）。数据位于 [evaluation/best](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/best/)。
 
 结果：0/100 拦截、100/100 敌方攻击成功、0/100 timeout；平均 reward 352.6662，长度 282 步 / 28.2 s，平均回合最小敌我距离 20.2497 m，终点最近敌我距离 42.9220 m，终点敌机距基地 8.261147 m。成功拦截时间为 `null`；无我方 collision steps，无 hard clipping。它比 final 更接近敌机，但离严格 `<5m` 的目标仍有明显差距。
 
@@ -170,7 +172,7 @@ Pre-clipping critic gradient norm 的五段均值约 168 / 266 / 367 / 459 / 724
 
 ## 11. 正式 Random Baseline 对照
 
-本次重新运行 100 个完整 random episodes、28171 个实际环境步，seeds 1000–1099；使用现有 `env.sample_actions()` 的均匀随机动作与相同 evaluation 路径，未使用旧 3 回合结果。100 条状态轨迹均不同，全部保存于 [evaluation/random/episodes](../outputs/direct_attacker_100k/evaluation/random/episodes/)。随机评估脚本为 [evaluate_random.py](../outputs/direct_attacker_100k/analysis_scripts/evaluate_random.py)，逐项复核见 [independent_data_audit.json](../outputs/direct_attacker_100k/evaluation/random/independent_data_audit.json)。
+本次重新运行 100 个完整 random episodes、28171 个实际环境步，seeds 1000–1099；使用现有 `env.sample_actions()` 的均匀随机动作与相同 evaluation 路径，未使用旧 3 回合结果。100 条状态轨迹均不同，全部保存于 [evaluation/random/episodes](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/random/episodes/)。随机评估脚本为 [evaluate_random.py](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/analysis_scripts/evaluate_random.py)，逐项复核见 [independent_data_audit.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/random/independent_data_audit.json)。
 
 | 指标 | Final，100 episodes | Best，100 episodes | Random，100 episodes |
 | --- | ---: | ---: | ---: |
@@ -197,11 +199,11 @@ Collision 指我方任意一对距离 `<2m`，并非敌我拦截。Random 回报
 
 代表回合统一取每种策略正式评估的第 1 回合（seed 1000），不筛选较好轨迹。三图均包含完整 episode 和最后 5 s 局部视图，标注基地、10 m attack sphere、四机轨迹与起终点、outcome、steps、最小敌我距离、终点敌机距基地。
 
-- [Random 3D trajectory](../outputs/direct_attacker_100k/trajectories/random_trajectory_3d.png)：282 步，最近 30.7714 m，敌方攻击成功。这是代表回合值，不同于 100 回合均值 42.0406 m。
-- [Final 3D trajectory](../outputs/direct_attacker_100k/trajectories/final_trajectory_3d.png)：282 步，最近 58.3119 m，敌方攻击成功。
-- [Best 3D trajectory](../outputs/direct_attacker_100k/trajectories/best_trajectory_3d.png)：282 步，最近 20.2497 m，敌方攻击成功。
+- [Random 3D trajectory](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/trajectories/random_trajectory_3d.png)：282 步，最近 30.7714 m，敌方攻击成功。这是代表回合值，不同于 100 回合均值 42.0406 m。
+- [Final 3D trajectory](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/trajectories/final_trajectory_3d.png)：282 步，最近 58.3119 m，敌方攻击成功。
+- [Best 3D trajectory](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/trajectories/best_trajectory_3d.png)：282 步，最近 20.2497 m，敌方攻击成功。
 
-原始轨迹分别保存于 `evaluation/{random,final,best}/first_episode.npz`；原始行为对照见 [behavior_comparison_raw.png](../outputs/direct_attacker_100k/behavior/behavior_comparison_raw.png)，逐机时间序列和诊断见 [behavior_summary.json](../outputs/direct_attacker_100k/behavior/behavior_summary.json)。
+原始轨迹分别保存于 `evaluation/{random,final,best}/first_episode.npz`；原始行为对照见 [behavior_comparison_raw.png](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/behavior/behavior_comparison_raw.png)，逐机时间序列和诊断见 [behavior_summary.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/behavior/behavior_summary.json)。
 
 Final 在前 5 s 主动向敌机前出，自身径向接近速度均值约 3.52–4.09 m/s；但随后侧偏、散开，没有形成有效提前截击。P0 在 17.5 s 最接近时仍有约 56.54 m 的 y 偏差，并继续沿错误侧向加速。末 5 s 三机自身径向接近速度均为负，末态离敌机 233.79–435.03 m。动作已有结构，不能简单称为仍在均匀随机飞行；主要失败是方向对准和错失后的修正。
 
@@ -235,7 +237,7 @@ Final/best 均无成功回合，成功拦截位置、完成者及其余两机当
 | 1004 | 277 / 27.7 s | P0 | `[18.186917,0,1.644858]` | 18.261147 | `[4.627888,36.063101,65.317503]` |
 | 1020 | 258 / 25.8 s | P2 | `[56.032449,0,5.067678]` | 56.261147 | `[74.439012,89.859866,4.266971]` |
 
-其余两机距离较远，这两次是随机偶遇成功，没有协同拦截的证据；完整数据保留在相应 episode NPZ 和 [random evaluation_metrics.csv](../outputs/direct_attacker_100k/evaluation/random/evaluation_metrics.csv)。
+其余两机距离较远，这两次是随机偶遇成功，没有协同拦截的证据；完整数据保留在相应 episode NPZ 和 [random evaluation_metrics.csv](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/random/evaluation_metrics.csv)。
 
 ## 15. 是否学会任务
 
@@ -259,7 +261,7 @@ Final/best 均无成功回合，成功拦截位置、完成者及其余两机当
 | 输出动作 `abs(a)>0.95` 比例 | 0% | 0% |
 | 最大确定性动作绝对值 | 0.8231 | 0.0508 |
 
-同配置 seed 0 新初始化 actor **仅做一次初态前向计算**，未运行环境、更新或保存新模型，首层饱和已达 98.70%，平均 Tanh 导数约 0.000387。结合 critic 裁剪前梯度增长，输入尺度/首层低敏感性是优先排查的具体优化候选机制。该阈值为诊断定义，不是配置改动；首层饱和不等于整网或动作输出饱和，也未证明它是唯一根因。明细见 [input_activation_analysis.json](../outputs/direct_attacker_100k/input_activation_analysis.json)。
+同配置 seed 0 新初始化 actor **仅做一次初态前向计算**，未运行环境、更新或保存新模型，首层饱和已达 98.70%，平均 Tanh 导数约 0.000387。结合 critic 裁剪前梯度增长，输入尺度/首层低敏感性是优先排查的具体优化候选机制。该阈值为诊断定义，不是配置改动；首层饱和不等于整网或动作输出饱和，也未证明它是唯一根因。明细见 [input_activation_analysis.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/input_activation_analysis.json)。
 
 探索熵随训练下降且训练从未采到成功；有限预算、探索分布和 PPO 信号可能共同影响学习。但 KL/clip fraction 没有明显失控，单次 seed 不能据此断言学习率错误、100k 必然不足或换超参数必然有效。
 
@@ -273,7 +275,7 @@ Final/best 均无成功回合，成功拦截位置、完成者及其余两机当
 
 21D actor 没有显式 base-relative information，可能不利于学习“在攻击球外拦截”与跨进攻方向泛化；jerk 限制使用的前一步加速度也不在 21D/24D 输入中。二者均值得单独验证，但当前固定初态不能把缺少基地信息直接认作失败的必要原因。
 
-为区分“优化失败”与“固定案例物理不可达”，另执行了**一次零训练、无搜索的简单追踪诊断**，只用现有 21D 中自身速度及敌机相对位置，以 YAML 中 20m/s、gain=1 生成速度误差加速度，再交给完全不变的 `env.step()`。该诊断在 160 步 / 16.0 s 成功：P0 距敌机 3.2438 m，P1/P2 各 5.4375 m，敌机距基地 252.2611 m，hard clip=0。数据见 [physical_feasibility/diagnostic.json](../outputs/direct_attacker_100k/behavior/physical_feasibility/diagnostic.json) 和原始 trajectory NPZ。
+为区分“优化失败”与“固定案例物理不可达”，另执行了**一次零训练、无搜索的简单追踪诊断**，只用现有 21D 中自身速度及敌机相对位置，以 YAML 中 20m/s、gain=1 生成速度误差加速度，再交给完全不变的 `env.step()`。该诊断在 160 步 / 16.0 s 成功：P0 距敌机 3.2438 m，P1/P2 各 5.4375 m，敌机距基地 252.2611 m，hard clip=0。数据见 [physical_feasibility/diagnostic.json](../outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/behavior/physical_feasibility/diagnostic.json) 和原始 trajectory NPZ。
 
 它只证明当前固定案例在现有约束和相对信息下存在可行追踪，不是 MAPPO 学习结果、正式 random 对照或优质协同策略。它有 98 个 collision steps（61.25%），回报仅 103.5644；成功但碰撞多的控制器回报低于一些失败轨迹，进一步提供分析奖励权衡的动机，却不能证明无碰撞成功策略也会得低回报。
 
@@ -296,11 +298,11 @@ Fixed initialization 限制探索覆盖和泛化，同一共享 actor 对相似�
 主要交付：
 
 - 本报告：`experiments/DIRECT_ATTACKER_MAPPO_100K_REPORT.md`。
-- 配置、代码版本、SHA256、检查结果：`outputs/direct_attacker_100k/{freeze_manifest.json,source_snapshot/,metadata.json,experiment_verification.json}`。
+- 配置、代码版本、SHA256、检查结果：`outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/{freeze_manifest.json,source_snapshot/,metadata.json,experiment_verification.json}`。
 - 训练：`training_console.log`、`training_metrics.csv`、`updates.csv`、`training_data.npz`、`updates_data.npz`、`checkpoints/{final,best}.pt`。
-- 曲线：`outputs/direct_attacker_100k/plots/`，共 15 张，原始数据和 rolling window 标注均保留。
-- 正式各 100 回合结果：`outputs/direct_attacker_100k/evaluation/{final,best,random}/` 下 CSV、summary、metadata 和首回合 NPZ；random 另有全部 100 条 NPZ。
-- 三策略完整 3D 图：`outputs/direct_attacker_100k/trajectories/{random,final,best}_trajectory_3d.png`。
+- 曲线：`outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/plots/`，共 15 张，原始数据和 rolling window 标注均保留。
+- 正式各 100 回合结果：`outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/evaluation/{final,best,random}/` 下 CSV、summary、metadata 和首回合 NPZ；random 另有全部 100 条 NPZ。
+- 三策略完整 3D 图：`outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000/trajectories/{random,final,best}_trajectory_3d.png`。
 - 行为、输入激活与单次可达性诊断：`behavior/`、`input_activation_analysis.json`；可复查分析脚本位于 `analysis_scripts/`。
 
 本次保留真实失败结果，没有修改已有源码、配置、tests、README 或 BASELINE_SPEC；不需要额外确认即可查看全部产物。后续研究性改动应另行明确实验范围。

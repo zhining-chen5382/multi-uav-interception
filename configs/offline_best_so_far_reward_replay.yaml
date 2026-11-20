@@ -1,0 +1,9 @@
+# Analysis-only configuration. The previous manifest fixes samples and categories.
+previous_analysis: outputs/formal_ppo_v1/_离线奖励标定/01_普通距离差分
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/02_历史最小距离差分
+length_scales_m: [10.0, 20.0, 30.0]
+betas: [20.0, 40.0, 60.0]
+focus_lambda_m: 20.0
+focus_beta: 40.0
+# Gamma, original reward and dt come from the previous frozen analysis/configs.
+target_capture_shaping_range: [30.0, 50.0]

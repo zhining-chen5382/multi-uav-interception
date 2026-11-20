@@ -1,0 +1,101 @@
+schema_version: 1
+organized_on: '2026-11-20'
+root: outputs/formal_ppo_v1
+meaning: 版本代表研究方案；独立Seed为独立run；续训属于同一run的后续阶段；冻结评估不新增训练版本。
+versions:
+  - id: v14
+    title: 单机PPO原始奖励
+    directory: v14_单机PPO_原始奖励
+    purpose: 建立1v1、16维固定归一化、来袭方向±30°的正式PPO参考结果。
+    change: 原距离成本、时间成本、捕获+500和失守−100，尚未加入near和线段成本。
+    seeds: [1001, 1002, 1003, 1004, 1005]
+    stages:
+      - directory: 01_从零训练至300k
+        total_steps: 300000
+      - directory: 02_续训至500k
+        total_steps: 500000
+    training_config: configs/ppo_formal_v1.yaml
+  - id: v15
+    title: 历史最小距离奖励
+    directory: v15_历史最小距离奖励
+    purpose: 检验保留历史接近收益是否改善near miss和捕获能力。
+    change: 在原奖励上加入record-minimum near，λ20m、β100。
+    seeds: [1001, 1002, 1003]
+    stages:
+      - directory: 01_从零训练至300k
+        total_steps: 300000
+    training_config: configs/ppo_reward_ab.yaml
+  - id: v16
+    title: 线段偏离成本k0.1
+    directory: v16_线段偏离成本_k0p1
+    purpose: 检验基地—敌机三维闭线段偏离成本，改善横向交会精度。
+    change: 保留record-minimum near β100、λ20m，新增k0.1线段距离时间成本。
+    seeds: [1001, 1002, 1003]
+    stages:
+      - directory: 01_从零训练至300k
+        total_steps: 300000
+      - directory: 02_Seed1001续训至500k
+        total_steps: 500000
+        seeds: [1001]
+    training_config: configs/ppo_line_cost_k0p1.yaml
+  - id: v17
+    title: 主动接近归因k0.01
+    directory: v17_主动接近归因_k0p01
+    purpose: 扣除敌机被动接近贡献，比较主动near奖励的强度。
+    change: motion-attributed near，k0.01、λ20m，两组β100与β200；相对v16同时改变归因与k。
+    seeds: [1001, 1002, 1003]
+    stages:
+      - directory: 01_主动接近配比训练/beta100_k0p01
+        total_steps: 300000
+        group: beta100_k0p01
+      - directory: 01_主动接近配比训练/beta200_k0p01
+        total_steps: 300000
+        group: beta200_k0p01
+    training_config: configs/ppo_active_near_beta100.yaml
+moves:
+  - old: formal_20261116
+    new: v14_单机PPO_原始奖励/01_从零训练至300k
+  - old: formal_20261116_continuation_500k
+    new: v14_单机PPO_原始奖励/02_续训至500k
+  - old: analysis_20261117_coordinate_learning
+    new: v14_单机PPO_原始奖励/分析/坐标与学习行为_20261117
+  - old: reward_ab_best_so_far_300k_20261117
+    new: v15_历史最小距离奖励/01_从零训练至300k
+  - old: line_cost_k0p1_300k_20261117
+    new: v16_线段偏离成本_k0p1/01_从零训练至300k
+  - old: line_cost_k0p1_seed1001_continuation_500k_20261119
+    new: v16_线段偏离成本_k0p1/02_Seed1001续训至500k
+  - old: line_cost_best310k_full_circle_eval_20261119
+    new: v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/全圆方向测试
+  - old: line_cost_best310k_neg29_to_neg5_independent_500_20261119
+    new: v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/负29至负5度独立测试
+  - old: active_near_beta_ab_300k_20261118
+    new: v17_主动接近归因_k0p01/01_主动接近配比训练
+  - old: offline_near_reward_replay_20261117
+    new: _离线奖励标定/01_普通距离差分
+  - old: offline_best_so_far_reward_replay_20261117
+    new: _离线奖励标定/02_历史最小距离差分
+  - old: offline_best_so_far_beta_sweep_20261117
+    new: _离线奖励标定/03_历史距离beta标定
+  - old: offline_line_cost_calibration_20261117
+    new: _离线奖励标定/04_线段成本标定
+  - old: offline_active_near_replay_20261118
+    new: _离线奖励标定/05_主动接近重放_首次
+  - old: offline_active_near_replay_20261118_002
+    new: _离线奖励标定/05_主动接近重放_002
+  - old: offline_active_near_replay_20261118_003
+    new: _离线奖励标定/05_主动接近重放_003
+  - old: offline_active_near_calibration_20261118
+    new: _离线奖励标定/06_主动接近与线段配比
+  - old: _engineering_20261116
+    new: _工程验收/01_初始工程测试
+  - old: _normalization_confirmed_20261116
+    new: _工程验收/02_归一化确认
+  - old: formal_20261116_acceptance_smoke
+    new: _工程验收/03_正式300k配置Smoke
+  - old: _acceptance_confirmed_20261116
+    new: _工程验收/04_正式训练验收
+  - old: formal_20261116_continuation_500k_acceptance_smoke
+    new: _工程验收/05_续训500k配置Smoke
+  - old: _extension_acceptance_20261116
+    new: _工程验收/06_续训工程验收

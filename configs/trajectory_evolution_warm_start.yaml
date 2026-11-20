@@ -1,0 +1,5 @@
+# The source policy has already consumed 92,160 steps in the reproduction run.
+# Chart/CSV steps count new environment work in this curriculum run only.
+target_steps: [0, 10000, 20000, 40000, 60000, 80000, 100000, 200000, 300000, 400000, 500000, 600000, 700000]
+step_label: Added step
+subtitle_note: "Warm start: pretrained 92,160-step policy; step 0 is the imported policy, chart steps count new work."

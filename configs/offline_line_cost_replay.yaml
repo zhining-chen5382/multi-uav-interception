@@ -1,0 +1,21 @@
+# Analysis-only coefficient grid. This file is independent of training configs.
+source_root: outputs/formal_ppo_v1/v15_历史最小距离奖励/01_从零训练至300k
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/04_线段成本标定
+seeds: [1001, 1002, 1003]
+postprocessing:
+  1001: postprocessing_001
+  1002: postprocessing_002
+  1003: postprocessing_001
+coefficients: [0.0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1]
+coefficient_units: points_per_metre_second
+geometry: three_dimensional_closed_base_attacker_segment
+sampling: post_step_distance_times_recorded_dt
+stationary_source_seed: 1003
+diagnostic_coefficient: 0.01
+# Recommendation checks are analysis choices, not production requirements.
+calibration_checks:
+  capture_mean_cost_max: 20.0
+  capture_max_cost_max: 50.0
+  clear_failure_mean_cost_min: 10.0
+  capture_failure_discounted_mean_gap_min: 0.0
+  stationary_near_miss_outrank_increase_max: 0.05

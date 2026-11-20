@@ -1,0 +1,21 @@
+checkpoint: outputs/v08_捕获奖励500/v08-r01_20261108_seed000/checkpoints/update_000180.pt
+expected_checkpoint_sha256: d5d78f3045a2bb9d865028182db21a7128603e02d890cef5dfcabd0ed97609cd
+expected_env_steps: 92160
+reference_environment_config: configs/baseline_capture500.yaml
+reference_trajectory: outputs/v08_捕获奖励500/v08-r01_20261108_seed000/evaluation/screened_success/first_episode.npz
+output_dir: outputs/v08_捕获奖励500/direction_ccw90_92160_20261109
+seed: 1000
+rotation_degrees: 90.0
+attacker_position:
+- 0.0
+- 497.4937
+- 50.0
+visualization:
+  dpi: 160
+  figure_size:
+  - 10
+  - 8
+  video_fps: 10
+  video_resolution:
+  - 1280
+  - 720

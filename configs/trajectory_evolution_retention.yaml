@@ -1,0 +1,4 @@
+# Saved evaluations are exact 2k work snapshots; the PPO rollout is not split.
+target_steps: [0, 2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000]
+step_label: Added step
+subtitle_note: "Fixed 0-degree retention test. Step 0 imports the pretrained 92,160-step model; chart steps are new work."

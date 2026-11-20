@@ -9,6 +9,30 @@ import yaml
 from envs.pursuit_env import PursuitEnv
 
 
+REWARD_METRIC_FIELDS = (
+    "cumulative_active_progress_reward", "cumulative_survival_penalty",
+    "cumulative_collision_penalty", "terminal_reward",
+    "cumulative_absolute_distance_cost",
+)
+
+
+def reward_episode_metrics(info):
+    """Expose weighted episode totals; absent historical terms remain null.
+
+    Raw distance differences in reward_components are diagnostics, not reward
+    terms, and must never be added to the episode return a second time.
+    """
+    components = info.get("episode_reward_components", {})
+    return {
+        "cumulative_active_progress_reward": components.get("active_progress_reward"),
+        "cumulative_survival_penalty": components.get("survival"),
+        "cumulative_collision_penalty": components.get("collision"),
+        "terminal_reward": (components["capture"] + components.get("attack_failure", 0.0)
+                            if "capture" in components else None),
+        "cumulative_absolute_distance_cost": components.get("absolute_distance_cost"),
+    }
+
+
 def run_episode(env, agent, seed):
     """Execute the shared actor using only each pursuer's local observation.
 
@@ -23,6 +47,8 @@ def run_episode(env, agent, seed):
     base_distances = [info.get("distance_to_base")]
     actions_history = []
     rewards_history = []
+    component_names = None
+    component_history = []
     terminated = truncated = False
     while not (terminated or truncated):
         # No centralized state reaches the actor during evaluation (CTDE).
@@ -31,6 +57,10 @@ def run_episode(env, agent, seed):
         states.append(env.states.copy())
         actions_history.append(np.asarray(actions).copy())
         rewards_history.append(float(rewards[0]))
+        components = info.get("reward_components", {})
+        if component_names is None:
+            component_names = tuple(components)
+        component_history.append([components[name] for name in component_names])
         min_distances.append(float(info["min_distance"]))
         collision_pairs.append(int(info["collision_pairs"]))
         base_distances.append(info.get("distance_to_base"))
@@ -65,6 +95,7 @@ def run_episode(env, agent, seed):
         "boundary_clip_count": int(info.get("boundary_clip_count", 0)),
         "attacker_boundary_clip_count": int(info["boundary_clip_counts"][-1])
             if "boundary_clip_counts" in info else 0,
+        **reward_episode_metrics(info),
     }
     trajectory = {
         "positions": positions,
@@ -74,6 +105,9 @@ def run_episode(env, agent, seed):
         "rewards": np.asarray(rewards_history),
         "min_distance": np.asarray(min_distances),
         "collision_pairs": np.asarray(collision_pairs, dtype=np.int64),
+        # One row per transition; positions/time also include the reset state.
+        "reward_component_names": np.asarray(component_names, dtype=str),
+        "reward_components": np.asarray(component_history, dtype=np.float64),
     }
     if getattr(env, "mission_enabled", False):
         trajectory.update(
@@ -166,7 +200,7 @@ def summarize_episodes(rows):
                       if row.get("attacker_base_terminal_distance") is not None]
     collision_steps = sum(row["collision_steps"] for row in rows)
     total_steps = sum(row["episode_length"] for row in rows)
-    return {
+    summary = {
         "episodes": len(rows),
         "capture_rate": float(np.mean([row["captured"] for row in rows])),
         "interception_success_rate": float(np.mean([
@@ -195,6 +229,12 @@ def summarize_episodes(rows):
             row["average_pairwise_pursuer_distance"] for row in rows
         ])),
     }
+    for name in REWARD_METRIC_FIELDS:
+        values = [row.get(name) for row in rows]
+        summary["average_" + name] = (
+            float(np.mean(values)) if all(value is not None for value in values) else None
+        )
+    return summary
 
 
 def write_json(path, data):

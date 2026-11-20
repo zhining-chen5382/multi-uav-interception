@@ -1,0 +1,84 @@
+# v07: post-step nearest distance time cost; physics and terminal conditions unchanged.
+environment:
+  dimension: 3
+  num_pursuers: 3
+  num_evaders: 1
+  dt: 0.1
+  max_episode_steps: 500
+  bounds:
+    low:
+    - -750.0
+    - -750.0
+    - -750.0
+    high:
+    - 750.0
+    - 750.0
+    - 750.0
+mission:
+  base_position:
+  - 0.0
+  - 0.0
+  - 0.0
+  detection_radius: 500.0
+  attack_radius: 10.0
+initialization:
+  pursuer_positions:
+  - - 1.5
+    - 0.0
+    - 1.0
+  - - -0.75
+    - 1.25
+    - 1.0
+  - - -0.75
+    - -1.25
+    - 1.0
+  attacker_position:
+  - 497.49371855331
+  - 0.0
+  - 50.0
+  pursuer_velocities:
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 0.0
+  attacker_velocity:
+  - 0.0
+  - 0.0
+  - 0.0
+pursuer:
+  max_horizontal_speed: 20.0
+  max_climb_speed: 8.0
+  max_descent_speed: 6.0
+  max_horizontal_acceleration: 3.0
+  max_vertical_acceleration: 2.0
+  max_jerk: 5.0
+attacker:
+  max_horizontal_speed: 20.0
+  max_climb_speed: 8.0
+  max_descent_speed: 6.0
+  max_horizontal_acceleration: 3.0
+  max_vertical_acceleration: 2.0
+  max_jerk: 5.0
+  policy:
+    mode: direct
+    attack_speed: 20.0
+    velocity_gain: 1.0
+    distance_epsilon: 1.0e-06
+safety:
+  pursuer_safety_distance: 2.0
+capture:
+  radius: 5.0
+reward:
+  capture_reward: 100.0
+  attack_failure_penalty: -100.0
+  survival_penalty_per_second: -0.2
+  collision_penalty: -5.0
+  distance_cost_coefficient: 0.01
+rollout:
+  seed: 0
+  episodes: 3

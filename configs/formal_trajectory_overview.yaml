@@ -1,0 +1,13 @@
+selection: all_unique_actor_policies
+phase_boundaries: [0, 100000, 200000, 300000]
+colormap: Blues
+shade_min: 0.30
+shade_max: 0.98
+line_alpha: 0.68
+line_width: 1.0
+highlight_line_width: 2.1
+end_marker_size: 10
+figure_size: [18.0, 7.0]
+phase_figure_size: [18.0, 14.0]
+dpi: 180
+padding_fraction: 0.06

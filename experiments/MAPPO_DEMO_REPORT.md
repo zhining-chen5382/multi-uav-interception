@@ -1,5 +1,7 @@
 # MAPPO Baseline v1 demo 实现与验证记录
 
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
 日期：2026-10-24。此记录是流程验证，尚不是收敛或协同行为的研究结论。
 
 ## 1. 完成范围与文件
@@ -82,7 +84,7 @@ checkpoint 后确定性动作与价值一致，以及三个 CLI 的端到端调�
 本次已实际执行：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 4096 --output-dir outputs/mappo_demo
+.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 4096 --output-dir outputs/v01_旧追逃实验/v01-r02_20261024_seed000
 ```
 
 8 次更新、8 个完整回合、96 步未完成回合。完整回合平均团队回报 `-141.439959`，
@@ -90,8 +92,8 @@ checkpoint 后确定性动作与价值一致，以及三个 CLI 的端到端调�
 最终一次 actor loss `-0.00946088`、value loss `5.76212791`、entropy `1.78363825`。
 未完成回合保存在 checkpoint 状态中，不作为第九个完整回合写入 CSV。
 
-另一次先前的 4096 步运行保留在 `outputs/mappo_smoke_4096/`，
-该运行起初继承全局 NumPy；当前交付演示以完全隔离依赖的 `outputs/mappo_demo/` 为准。
+另一次先前的 4096 步运行保留在 `outputs/v01_旧追逃实验/v01-r01_20261024_seed000/`，
+该运行起初继承全局 NumPy；当前交付演示以完全隔离依赖的 `outputs/v01_旧追逃实验/v01-r02_20261024_seed000/` 为准。
 
 ## 8. 正式训练入口
 
@@ -109,7 +111,7 @@ checkpoint 后确定性动作与价值一致，以及三个 CLI 的端到端调�
 已实际执行：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/mappo_demo/checkpoints/final.pt --episodes 3
+.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v01_旧追逃实验/v01-r02_20261024_seed000/checkpoints/final.pt --episodes 3
 ```
 
 | 指标 | 实测值 |
@@ -133,10 +135,10 @@ checkpoint 后确定性动作与价值一致，以及三个 CLI 的端到端调�
 已实际执行：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/mappo_demo/checkpoints/final.pt
+.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/v01_旧追逃实验/v01-r02_20261024_seed000/checkpoints/final.pt
 ```
 
-生成 `outputs/mappo_demo/trajectory_3d.png` 与 `trajectory.npz`。
+生成 `outputs/v01_旧追逃实验/v01-r02_20261024_seed000/trajectory_3d.png` 与 `trajectory.npz`。
 已检查绘图效果：四条可辨轨迹、起终点、坐标轴、图例与真实 captured/steps 标题齐全。
 NPZ 包含 `(501,4,3)` 位置、`(501,4,6)` 状态、`(500,3,3)` 动作、时间和逐步指标。
 
@@ -150,7 +152,7 @@ NPZ 包含 `(501,4,3)` 位置、`(501,4,6)` 状态、`(500,3,3)` 动作、时间
   没有设置 `KMP_DUPLICATE_LIB_OK`。
 - `metadata.json` 保存运行时 Git 版本 `23bf55576cca27944b4ee2ae5c53a70295c7dac3`、
   `git_dirty=true`、seed、有效配置与路径；代码修改尚未提交。
-- `checkpoints/final.pt`、`best.pt`、CSV、JSON、NPZ 和 PNG 位于 `outputs/mappo_demo/`。
+- `checkpoints/final.pt`、`best.pt`、CSV、JSON、NPZ 和 PNG 位于 `outputs/v01_旧追逃实验/v01-r02_20261024_seed000/`。
 - 测试中的逐更新 checkpoint 保存/加载也已通过。输出和虚拟环境均不进入 Git。
 
 ## 12. 已知限制

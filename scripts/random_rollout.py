@@ -6,7 +6,7 @@ import json
 import numpy as np
 
 from envs.pursuit_env import DEFAULT_CONFIG, PursuitEnv
-from utils.evaluation import episode_outcome
+from utils.evaluation import episode_outcome, reward_episode_metrics
 
 
 def main():
@@ -72,6 +72,7 @@ def main():
             "attacker_boundary_clip_count": int(info["boundary_clip_counts"][-1]),
             "evader_boundary_steps": evader_boundary_steps,
             "evader_max_consecutive_boundary_steps": max_consecutive_boundary_steps,
+            **reward_episode_metrics(info),
         }))
 
 

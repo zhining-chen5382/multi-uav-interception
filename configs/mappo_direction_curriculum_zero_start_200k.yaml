@@ -1,0 +1,81 @@
+env_config: baseline_capture500.yaml
+seed: 0
+device: cpu
+torch_num_threads: 1
+output_dir: outputs/v09_来袭方向课程/v09-r02_20261109_seed000/continuation_200k
+training:
+  total_env_steps: 200000
+  rollout_steps: 512
+  log_interval_updates: 1
+  checkpoint_interval_updates: 10
+  capture_rate_window: 50
+network:
+  actor_hidden_sizes:
+  - 128
+  - 128
+  critic_hidden_sizes:
+  - 256
+  - 256
+  initial_log_std: -0.5
+  min_log_std: -5.0
+  max_log_std: 2.0
+  hidden_gain: 1.4142135623730951
+  actor_output_gain: 0.01
+  critic_output_gain: 1.0
+ppo:
+  actor_learning_rate: 0.0003
+  critic_learning_rate: 0.001
+  adam_epsilon: 1.0e-05
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_ratio: 0.2
+  update_epochs: 4
+  minibatch_size: 64
+  entropy_coefficient: 0.01
+  value_loss_coefficient: 0.5
+  max_grad_norm: 0.5
+  advantage_normalization: true
+  normalization_epsilon: 1.0e-08
+normalization:
+  observation: false
+  global_state: false
+  reward_scale: 1.0
+evaluation:
+  episodes: 100
+  seed: 1000
+visualization:
+  seed: 1000
+  dpi: 160
+  figure_size:
+  - 10
+  - 8
+curriculum:
+  stage_half_angles_degrees:
+  - 0.0
+  - 2.0
+  - 5.0
+  - 10.0
+  - 30.0
+  - 60.0
+  - 90.0
+  max_stage_steps: 100000
+  evaluation_interval_steps: 10000
+  evaluation_episodes: 100
+  promotion_capture_rate: 0.8
+  required_consecutive_evaluations: 2
+  evaluation_seed: 1000
+  stage_sampling_seed_stride: 10000
+  monitor_previous_stage: true
+  collision_selection_metric: collision_episode_rate
+  zero_angle_evaluation_episodes: 1
+  zero_angle_promotion_capture_rate: 1.0
+  stage_step_budgets:
+  - 200000
+  - 100000
+  - 100000
+  - 100000
+  - 100000
+  - 100000
+  - 100000
+continuation:
+  source_output: outputs/v09_来袭方向课程/v09-r02_20261109_seed000

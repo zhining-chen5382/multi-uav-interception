@@ -1,0 +1,10 @@
+# Offline analysis only. Coefficients match the current reward experiment.
+previous_analysis: outputs/formal_ppo_v1/_离线奖励标定/04_线段成本标定
+current_root: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/01_从零训练至300k
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/05_主动接近重放_003
+seeds: [1001, 1002, 1003]
+stationary_source_seed: 1003
+length_scale_m: 20.0
+beta: 100.0
+line_coefficient: 0.1
+current_representative_categories: [capture, near_miss]

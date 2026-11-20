@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "record_date": "2026-11-08",
+  "date_timezone": "Asia/Shanghai",
+  "reason": "User-requested versioned output directory names; scientific artifacts keep original bytes.",
+  "mappings": {
+    "outputs/mappo_smoke_4096": "outputs/v01_旧追逃实验/v01-r01_20261024_seed000",
+    "outputs/mappo_demo": "outputs/v01_旧追逃实验/v01-r02_20261024_seed000",
+    "outputs/formal_run_100k": "outputs/v01_旧追逃实验/v01-r03_20261024_seed000",
+    "outputs/boundary_mechanism_validation": "outputs/v02_边界机制验证/validation_20261024_boundary",
+    "outputs/point_defense_validation": "outputs/v03_GoalDirected点防御/validation_20261024_point_defense",
+    "outputs/direct_attacker_validation": "outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker",
+    "outputs/direct_attacker_100k": "outputs/v04_DirectAttacker_旧奖励/v04-r02_20261025_seed000",
+    "outputs/active_progress_reward_20k": "outputs/v05_ActiveProgress奖励/v05-r01_20261025_seed000",
+    "outputs/active_reward_100k": "outputs/v05_ActiveProgress奖励/v05-r02_20261025_seed000",
+    "outputs/project_management_20261108": "outputs/_project_项目核对与管理资料/20261108_management",
+    "outputs/project_resume_20261107": "outputs/_project_项目核对与管理资料/20261107_resume",
+    "outputs/visualization_check": "outputs/_project_项目核对与管理资料/undated_visualization_check",
+    "outputs/v01": "outputs/v01_旧追逃实验",
+    "outputs/v02": "outputs/v02_边界机制验证",
+    "outputs/v03": "outputs/v03_GoalDirected点防御",
+    "outputs/v04": "outputs/v04_DirectAttacker_旧奖励",
+    "outputs/v05": "outputs/v05_ActiveProgress奖励",
+    "outputs/v06": "outputs/v06_输入归一化",
+    "outputs/_project": "outputs/_project_项目核对与管理资料"
+  },
+  "audit_directory": "outputs/_project_项目核对与管理资料/20261108_output_organization",
+  "historical_paths": "Old paths inside checkpoints, metrics, snapshots, manifests and archived scripts describe original provenance; resolve them through this table.",
+  "initial_stage_unchanged": [
+    "outputs/v06"
+  ],
+  "descriptive_folder_labels": "experiments/output_folder_labels_20261108.json"
+}

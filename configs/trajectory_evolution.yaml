@@ -1,0 +1,13 @@
+enabled: true
+directory_name: trajectory_evolution
+target_steps: [0, 10000, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 250000, 300000]
+extra_checkpoint_steps: []
+angle_degrees: 0.0
+seed: 1000
+device: cpu
+torch_num_threads: 1
+dpi: 160
+figure_size: [15, 10]
+colormap: Blues
+shade_min: 0.28
+shade_max: 0.95

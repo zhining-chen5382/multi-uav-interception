@@ -1,0 +1,9 @@
+# Offline calibration choices. This file does not configure training.
+source_analysis: outputs/formal_ppo_v1/_离线奖励标定/05_主动接近重放_003
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/06_主动接近与线段配比
+betas: [100.0, 200.0, 300.0, 400.0]
+line_coefficients: [0.0, 0.001, 0.003, 0.01, 0.03, 0.1]
+length_scale_m: 20.0
+primary_datasets: [reference_B, current_k0p1]
+# Advisory preference from earlier reward discussions, not a training rule.
+failure_near_budget_reference: 80.0

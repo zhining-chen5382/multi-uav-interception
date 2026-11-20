@@ -90,14 +90,16 @@ def test_attack_sphere_is_strict_and_failure_has_configured_team_reward(
     assert info["distance_to_base"] == pytest.approx(distance)
     coefficients = baseline_config["reward"]
     expected_failure = coefficients["attack_failure_penalty"] if failed else 0.0
-    expected_progress = coefficients["progress_coefficient"] * (
-        initial["min_distance"] - info["min_distance"]
+    expected_progress = coefficients["active_progress_coefficient"] * (
+        (initial["min_distance"] - info["min_distance"])
+        - (initial["distance_to_base"] - info["distance_to_base"])
     )
     components = info["reward_components"]
     assert components["attack_failure"] == expected_failure
     assert components["capture"] == 0.0
     np.testing.assert_allclose(
-        rewards, [expected_failure + expected_progress + coefficients["time_penalty"]] * 3
+        rewards, [expected_failure + expected_progress
+                  + coefficients["survival_penalty_per_second"] * env.dt] * 3
     )
     with pytest.raises(RuntimeError):
         env.step(np.zeros((3, 3)))
@@ -138,7 +140,7 @@ def test_simultaneous_capture_and_attack_uses_capture_priority(config_factory, m
     assert not info["interception_failure"]
     assert info["reward_components"]["capture"] == 100.0
     assert info["reward_components"]["attack_failure"] == 0.0
-    np.testing.assert_allclose(rewards, [99.99] * 3)
+    np.testing.assert_allclose(rewards, [99.98] * 3)
 
 
 def test_attack_failure_penalty_is_read_from_yaml(config_factory):
@@ -146,14 +148,14 @@ def test_attack_failure_penalty_is_read_from_yaml(config_factory):
         initialization={"attacker_position": [9.0, 0.0, 0.0],
                         "pursuer_positions": [[-40, 0, 50], [-40, -20, 50], [-40, 20, 50]]},
         attacker=_quiet_aircraft(),
-        reward={"attack_failure_penalty": -73.0, "progress_coefficient": 0.0},
+        reward={"attack_failure_penalty": -73.0, "active_progress_coefficient": 0.0},
     )
     env = PursuitEnv(path)
     env.reset()
     _, reward, terminated, truncated, info = env.step(np.zeros((3, 3)))
     assert terminated and not truncated
     assert info["reward_components"]["attack_failure"] == -73.0
-    np.testing.assert_allclose(reward, [-73.01] * 3)
+    np.testing.assert_allclose(reward, [-73.02] * 3)
 
 
 @pytest.mark.parametrize("position,failed", [

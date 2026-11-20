@@ -1,5 +1,7 @@
 # Direct Attacker Baseline 制导修改与实际验证
 
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
 日期：2026-10-24。当前默认任务保持 3A1C 点防御，仅修改 attacker guidance。
 
 **结论：Direct Attacker 从原 500 m 固定初态出发，在 28.2 s / 282 步进入严格的 10 m 攻击球，入球速度约 20 m/s。**
@@ -77,7 +79,7 @@ $env:MPLBACKEND = "Agg"
 近攻击球仍保持期望速度、有限值/非法输入、完整 500 m 到达而非只检查前几秒、全程距离下降、
 零裁剪、真实攻击终止、21D/24D、YAML 参数以及旧配置兼容。原 dynamics 与 MAPPO pipeline 测试继续通过。
 
-修改前快照位于 `outputs/direct_attacker_validation/before_guidance_change/`。
+修改前快照位于 `outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/before_guidance_change/`。
 `implementation_audit.json` 独立确认：
 
 - 环境 YAML 除 `attacker.policy` 外完全相同。
@@ -90,7 +92,7 @@ $env:MPLBACKEND = "Agg"
 全量 pytest 通过后，实际运行：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.sanity_direct_attacker --config configs/baseline_3a1c.yaml --output-dir outputs/direct_attacker_validation/sanity
+.\.venv\Scripts\python.exe -m scripts.sanity_direct_attacker --config configs/baseline_3a1c.yaml --output-dir outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/sanity
 ```
 
 此入口只模拟一架攻击机，直接使用生产策略与生产 `integrate()`，没有 pursuers、没有拦截干扰，
@@ -118,9 +120,9 @@ $env:MPLBACKEND = "Agg"
 
 已保存并实际打开检查完整轨迹与攻击球局部放大图，以及未平滑的距离/速度曲线：
 
-![Direct Attacker 单机完整轨迹与入球局部图](../outputs/direct_attacker_validation/sanity/trajectory_3d.png)
+![Direct Attacker 单机完整轨迹与入球局部图](../outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/sanity/trajectory_3d.png)
 
-![距离和速度原始曲线](../outputs/direct_attacker_validation/sanity/distance_speed_raw.png)
+![距离和速度原始曲线](../outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/sanity/distance_speed_raw.png)
 
 `trajectory.npz` 保留初始及全部更新后状态、applied acceleration、desired velocity、raw acceleration command、
 时间、距离和裁剪布尔值；manifest 明确 `N+1` 状态与 `N` 指令的对齐关系。
@@ -150,10 +152,10 @@ $env:MPLBACKEND = "Agg"
 复现保存过程：
 
 ```powershell
-.\.venv\Scripts\python.exe outputs/direct_attacker_validation/validate_random_rollout.py
+.\.venv\Scripts\python.exe outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/validate_random_rollout.py
 ```
 
-![当前随机点防御完整回合](../outputs/direct_attacker_validation/random/seed0_trajectory_3d.png)
+![当前随机点防御完整回合](../outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/random/seed0_trajectory_3d.png)
 
 现有四机绘图函数已具备基地、10 m 攻击球、四机轨迹、起止点和任务结局信息；本轮复用它生成新制导的实际结果，
 未为绘图修改环境。标题显示 Enemy Attack Success、282 steps、最小敌我距离和最终基地距离。
@@ -163,10 +165,10 @@ $env:MPLBACKEND = "Agg"
 完成上述验证后仅运行一次 **512 步**手动 smoke，使用默认网络、PPO、seed 0 和 CPU：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 512 --output-dir outputs/direct_attacker_validation/smoke_train
-.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/direct_attacker_validation/smoke_train/checkpoints/final.pt --episodes 3 --output-dir outputs/direct_attacker_validation/evaluation_final
-.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/direct_attacker_validation/smoke_train/checkpoints/best.pt --episodes 3 --output-dir outputs/direct_attacker_validation/evaluation_best
-.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/direct_attacker_validation/smoke_train/checkpoints/final.pt --output-dir outputs/direct_attacker_validation/visualization
+.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 512 --output-dir outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/smoke_train
+.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/smoke_train/checkpoints/final.pt --episodes 3 --output-dir outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/evaluation_final
+.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/smoke_train/checkpoints/best.pt --episodes 3 --output-dir outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/evaluation_best
+.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/smoke_train/checkpoints/final.pt --output-dir outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/visualization
 ```
 
 512/512 步正常完成、1 次 PPO update、1 个完整 282 步敌方攻击成功回合，下一回合 230 步未完成。
@@ -211,7 +213,7 @@ Final/best 各实际做 3 个 deterministic evaluation 回合，结果相同：
 | `README.md`、`BASELINE_SPEC.md` | 当前默认制导、命令、历史区别和局限 |
 | 本报告（新增） | 实际结果与可复现产物索引 |
 
-输出目录：`outputs/direct_attacker_validation/`。
+输出目录：`outputs/v04_DirectAttacker_旧奖励/validation_20261024_direct_attacker/`。
 包含 `sanity/`、`random/`、`smoke_train/`、`evaluation_final/`、`evaluation_best/`、`visualization/`、
 修改前快照、`implementation_audit.json`、`smoke_verification.json` 和随机验证脚本。
 旧点防御与 100k 实验产物未覆盖。

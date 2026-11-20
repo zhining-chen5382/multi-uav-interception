@@ -1,0 +1,18 @@
+# Offline analysis only. Production environment and PPO configuration are read-only inputs.
+source_root: outputs/formal_ppo_v1/v14_单机PPO_原始奖励/02_续训至500k
+output_dir: outputs/formal_ppo_v1/_离线奖励标定/01_普通距离差分
+seeds: [1001, 1002, 1003, 1004, 1005]
+postprocessing:
+  1001: postprocessing_002
+  1002: postprocessing_001
+  1003: postprocessing_001
+  1004: postprocessing_001
+  1005: postprocessing_001
+length_scales_m: [10.0, 20.0, 30.0]
+betas: [20.0, 40.0, 60.0]
+# Gamma and original reward coefficients are read from saved experiment configs.
+near_miss_max_m: 10.0
+moderate_failure_max_m: 30.0
+clear_failure_min_m: 100.0
+target_capture_shaping_range: [30.0, 50.0]
+representatives_per_category: 2

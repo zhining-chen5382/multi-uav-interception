@@ -14,6 +14,10 @@ import yaml
 from .dynamics import MotionLimits, integrate, scale_action
 from .attacker_policy import DirectAttackerPolicy, GoalDirectedAttackerPolicy
 from .evader_policy import RepulsiveEvaderPolicy
+from .rewards import (
+    ABSOLUTE_DISTANCE_REWARD_TERMS, ACTIVE_REWARD_TERMS,
+    absolute_distance_components, active_progress_components,
+)
 
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[1] / "configs" / "baseline_3a1c.yaml"
@@ -61,6 +65,7 @@ class PursuitEnv:
         self.accelerations = np.zeros((self.num_pursuers + 1, self.dimension))
         self._boundary_clip_counts = np.zeros(self.num_pursuers + 1, dtype=np.int64)
         self._boundary_clipped = np.zeros(self.num_pursuers + 1, dtype=bool)
+        self._episode_reward_components = {name: 0.0 for name in self._reward_terms}
         self.step_count = 0
         self._has_reset = False
         self._done = False
@@ -141,17 +146,54 @@ class PursuitEnv:
         self.safety_distance = _positive(
             config["safety"]["pursuer_safety_distance"], "safety.pursuer_safety_distance"
         )
+        reward_config = config["reward"]
+        active_names = ("active_progress_coefficient", "survival_penalty_per_second")
+        distance_names = ("distance_cost_coefficient", "survival_penalty_per_second")
+        legacy_names = ("progress_coefficient", "time_penalty")
+        self.active_progress_enabled = "active_progress_coefficient" in reward_config
+        self.absolute_distance_enabled = "distance_cost_coefficient" in reward_config
+        if self.absolute_distance_enabled:
+            if self.active_progress_enabled or any(name in reward_config for name in legacy_names):
+                raise ValueError("Cannot mix absolute distance reward with active or legacy progress/time keys")
+            if not self.mission_enabled:
+                raise ValueError("Absolute distance reward requires a mission/base position")
+            reward_names = ["capture_reward", *distance_names, "collision_penalty"]
+            self._reward_terms = ABSOLUTE_DISTANCE_REWARD_TERMS
+        elif self.active_progress_enabled:
+            if not self.mission_enabled:
+                raise ValueError("Active progress reward requires a mission/base position")
+            if any(name in reward_config for name in legacy_names):
+                raise ValueError("Cannot mix active progress reward with legacy progress/time keys")
+            reward_names = ["capture_reward", *active_names, "collision_penalty"]
+            self._reward_terms = ACTIVE_REWARD_TERMS
+        else:
+            if "survival_penalty_per_second" in reward_config:
+                raise ValueError("survival_penalty_per_second requires an active or absolute distance reward schema")
+            # Stored historical YAMLs retain their original reward. Schemas
+            # are exclusive: historical shaping is never silently combined.
+            reward_names = ["capture_reward", *legacy_names, "collision_penalty"]
+            self._reward_terms = ("capture", "progress", "time", "collision")
+            if self.mission_enabled:
+                self._reward_terms += ("attack_failure",)
         self.reward_coefficients = {}
-        reward_names = ["capture_reward", "progress_coefficient", "time_penalty", "collision_penalty"]
         if self.mission_enabled:
             reward_names.append("attack_failure_penalty")
         for name in reward_names:
-            value = float(config["reward"][name])
+            value = float(reward_config[name])
             if not np.isfinite(value):
                 raise ValueError("reward.{} must be finite".format(name))
             self.reward_coefficients[name] = value
         if self.mission_enabled and self.reward_coefficients["attack_failure_penalty"] >= 0:
             raise ValueError("reward.attack_failure_penalty must be negative")
+        if self.active_progress_enabled:
+            if self.reward_coefficients["active_progress_coefficient"] < 0:
+                raise ValueError("reward.active_progress_coefficient must be nonnegative")
+        if self.absolute_distance_enabled:
+            if self.reward_coefficients["distance_cost_coefficient"] <= 0:
+                raise ValueError("reward.distance_cost_coefficient must be positive")
+        if self.active_progress_enabled or self.absolute_distance_enabled:
+            if self.reward_coefficients["survival_penalty_per_second"] > 0:
+                raise ValueError("reward.survival_penalty_per_second must be nonpositive")
 
         initialization = config["initialization"]
         positions = np.vstack((
@@ -185,6 +227,7 @@ class PursuitEnv:
         self.accelerations = np.zeros((self.num_pursuers + 1, self.dimension))
         self._boundary_clip_counts = np.zeros(self.num_pursuers + 1, dtype=np.int64)
         self._boundary_clipped = np.zeros(self.num_pursuers + 1, dtype=bool)
+        self._episode_reward_components = {name: 0.0 for name in self._reward_terms}
         self.step_count = 0
         self._has_reset = True
         self._done = False
@@ -206,6 +249,10 @@ class PursuitEnv:
             raise RuntimeError("Call reset() before stepping a new episode")
         actions = _array(actions, self.action_shape, "actions")
         previous_min_distance = self._min_distance()
+        previous_base_distance = (
+            float(np.linalg.norm(self.states[-1, :3] - self.base_position))
+            if self.active_progress_enabled else None
+        )
         pursuer_command = scale_action(actions, self.pursuer_limits)
         attacker_command = self.attacker_policy(self.states[-1], self.states[:-1])
         pursuer_states, pursuer_accelerations = integrate(
@@ -232,21 +279,43 @@ class PursuitEnv:
         terminated = info["interception_success"] or info["attacker_reached_base"]
         truncated = self.step_count >= self.max_episode_steps and not terminated
         coefficients = self.reward_coefficients
-        components = {
-            "capture": coefficients["capture_reward"] if info["captured"] else 0.0,
-            "progress": coefficients["progress_coefficient"] * (
-                previous_min_distance - info["min_distance"]
-            ),
-            "time": coefficients["time_penalty"],
-            # A single team penalty per step whenever any pair is unsafe.
-            "collision": coefficients["collision_penalty"] if info["collision_pairs"] else 0.0,
-        }
-        if self.mission_enabled:
-            components["attack_failure"] = (
-                coefficients["attack_failure_penalty"] if info["attacker_reached_base"] else 0.0
+        if self.absolute_distance_enabled:
+            components = absolute_distance_components(
+                info["min_distance"], self.dt, coefficients,
+                captured=info["captured"], attacker_reached_base=info["attacker_reached_base"],
+                collision_pairs=info["collision_pairs"],
             )
-        rewards = np.full(self.num_pursuers, sum(components.values()), dtype=np.float64)
-        info["reward_components"] = components
+        elif self.active_progress_enabled:
+            components = active_progress_components(
+                previous_min_distance, info["min_distance"],
+                previous_base_distance, info["distance_to_base"], self.dt, coefficients,
+                captured=info["captured"], attacker_reached_base=info["attacker_reached_base"],
+                collision_pairs=info["collision_pairs"],
+            )
+        else:
+            components = {
+                "capture": coefficients["capture_reward"] if info["captured"] else 0.0,
+                "progress": coefficients["progress_coefficient"] * (
+                    previous_min_distance - info["min_distance"]
+                ),
+                "time": coefficients["time_penalty"],
+                # A single team penalty per step whenever any pair is unsafe.
+                "collision": coefficients["collision_penalty"] if info["collision_pairs"] else 0.0,
+            }
+            if self.mission_enabled:
+                components["attack_failure"] = (
+                    coefficients["attack_failure_penalty"] if info["attacker_reached_base"] else 0.0
+                )
+        # Raw distance/progress diagnostics are not extra reward terms.
+        team_reward = sum(components[name] for name in self._reward_terms)
+        totals = {name: self._episode_reward_components[name] + components[name]
+                  for name in self._reward_terms}
+        if not np.isfinite(team_reward) or not all(np.isfinite(value) for value in totals.values()):
+            raise ValueError("Reward computation exceeds the finite numerical range")
+        rewards = np.full(self.num_pursuers, team_reward, dtype=np.float64)
+        self._episode_reward_components = totals
+        info["reward_components"] = components.copy()
+        info["episode_reward_components"] = self._episode_reward_components.copy()
         self._done = terminated or truncated
         return self._observations(), rewards, terminated, truncated, info
 
@@ -300,4 +369,5 @@ class PursuitEnv:
             "boundary_clip_counts": self._boundary_clip_counts.copy(),
             "boundary_clipped": self._boundary_clipped.copy(),
             "boundary_steering_enabled": self.attacker_policy.boundary_enabled,
+            "episode_reward_components": self._episode_reward_components.copy(),
         }

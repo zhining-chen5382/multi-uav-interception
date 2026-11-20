@@ -1,0 +1,63 @@
+env_config: baseline_capture500.yaml
+seed: 0
+device: cpu
+torch_num_threads: 1
+output_dir: outputs/v13_低Std策略保持/fixed_std_20261116_seed000
+training:
+  total_env_steps: 20000
+  rollout_steps: 512
+  log_interval_updates: 1
+  checkpoint_interval_updates: 10
+  capture_rate_window: 50
+network:
+  actor_hidden_sizes: [128, 128]
+  critic_hidden_sizes: [256, 256]
+  initial_log_std: -0.5
+  min_log_std: -5.0
+  max_log_std: 2.0
+  hidden_gain: 1.4142135623730951
+  actor_output_gain: 0.01
+  critic_output_gain: 1.0
+ppo:
+  actor_learning_rate: 0.0003
+  critic_learning_rate: 0.001
+  adam_epsilon: 1.0e-05
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_ratio: 0.2
+  update_epochs: 4
+  minibatch_size: 64
+  entropy_coefficient: 0.01
+  value_loss_coefficient: 0.5
+  max_grad_norm: 0.5
+  advantage_normalization: true
+  normalization_epsilon: 1.0e-08
+normalization:
+  observation: false
+  global_state: false
+  reward_scale: 1.0
+evaluation:
+  episodes: 10
+  seed: 1000
+visualization:
+  seed: 1000
+  dpi: 160
+  figure_size: [10, 8]
+retention:
+  checkpoint: outputs/v08_捕获奖励500/v08-r01_20261108_seed000/checkpoints/update_000180.pt
+  expected_sha256: d5d78f3045a2bb9d865028182db21a7128603e02d890cef5dfcabd0ed97609cd
+  historical_trainable_std_reference: outputs/v11_ActorLR策略保持/actor_lr_20261110_seed000/A
+  groups:
+    - name: A
+      reset_adam: false
+      frozen_std_multiplier: 1.0
+    - name: B
+      reset_adam: false
+      frozen_std_multiplier: 0.15
+    - name: C
+      reset_adam: false
+      frozen_std_multiplier: 0.10
+  evaluation_interval_steps: 2000
+  evaluation_seed: 1000
+post_training:
+  trajectory_evolution_config: configs/trajectory_evolution_retention.yaml

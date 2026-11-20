@@ -1,5 +1,7 @@
 # Baseline v1 边界机制修复与验证
 
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
 日期：2026-10-24。仅实现用户指定的 workspace 扩大、evader soft boundary steering，
 保留 hard clip，不修改 MAPPO、网络、reward、observation、初始化、capture 或动力学限制。
 
@@ -19,7 +21,7 @@
 - `tests/test_mappo.py`：仅同步测试中的 workspace 尺度预期，不改 MAPPO 算法或输入定义。
 - `pytest.ini`：默认测试收集限定 `tests/`，避免历史实验源码快照产生同名模块冲突。
 - `README.md`、`BASELINE_SPEC.md`：同步新边界机制与局限。
-- 本报告及 `outputs/boundary_mechanism_validation/` 下的可复现诊断产物。
+- 本报告及 `outputs/v02_边界机制验证/validation_20261024_boundary/` 下的可复现诊断产物。
 
 `reset()` / `step()` 返回结构、21D observation 和 24D state 均不变。
 原有两参数 policy 构造方式继续可用。历史 YAML 完全不含三个新参数时保持旧策略，
@@ -74,7 +76,7 @@ $env:MPLBACKEND = "Agg"
 顺序、强弱追击威胁、旧接口、非法参数、裁剪计数累计/副本隔离/reset、strict boundary
 判定、未改变 pursuer 控制，以及完整随机运行。
 
-首次默认 pytest 还收集到 `outputs/formal_run_100k/source_snapshot/tests/` 的历史测试
+首次默认 pytest 还收集到 `outputs/v01_旧追逃实验/v01-r03_20261024_seed000/source_snapshot/tests/` 的历史测试
 副本，出现模块重名收集错误。新增 `pytest.ini` 修复收集范围，未删除实验快照。
 新增测试的一处 NumPy scalar YAML fixture 也已转换成 Python 原生列表后通过。
 这些是测试工程修正，没有改变研究逻辑。
@@ -124,7 +126,7 @@ seed 0 的 pursuer 状态与动作也逐元素相同，支持未向 pursuer 添�
 随机动作独立于 observation，这一对照不意味着将来闭环 MAPPO 在两场景中会选择
 相同动作；本轮未重训或修改 MAPPO。
 
-![三个场景的真实 evader 位置对照](../outputs/boundary_mechanism_validation/evader_position_comparison_seed0.png)
+![三个场景的真实 evader 位置对照](../outputs/v02_边界机制验证/validation_20261024_boundary/evader_position_comparison_seed0.png)
 
 ## 仍然存在的限制
 
@@ -148,7 +150,7 @@ seed 0 在第 161 步进入 x soft margin 时，`x=250.963 m`、`vx=19.908 m/s`�
 
 ## 产物与复现
 
-目录：`outputs/boundary_mechanism_validation/`。
+目录：`outputs/v02_边界机制验证/validation_20261024_boundary/`。
 
 - `diagnose_boundary.py`：三场景配对随机运行脚本。
 - `episodes.csv`、`summary.json`：全部 30 回合的原始指标与汇总。

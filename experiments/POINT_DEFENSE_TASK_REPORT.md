@@ -1,5 +1,7 @@
 # Baseline v1 点防御任务定义重构与验证
 
+路径说明（2026-11-08）：本文链接及命令示例已更新为版本目录；冻结快照、原始日志、metadata 与权重内嵌旧路径保留，见 [目录迁移表](output_path_migration_20261108.json)。
+
 日期：2026-10-24。
 
 **任务定义、终止/奖励、评估、绘图和 MAPPO 兼容流程已接通；但当前给定的攻击机加速度势场还不能保证无威胁时持续接近直至进入攻击球。**
@@ -15,7 +17,7 @@
 
 只读 Git HEAD：`23bf55576cca27944b4ee2ae5c53a70295c7dac3`。
 实际运行包含未提交的工作区改动，不能仅凭此 HEAD 重建本次代码；有效配置与源码 SHA256
-记录在 `outputs/point_defense_validation/manifest.json`，训练另有配置快照和 metadata。
+记录在 `outputs/v03_GoalDirected点防御/validation_20261024_point_defense/manifest.json`，训练另有配置快照和 metadata。
 没有执行 `git add`、`commit`、`merge` 或 `push`，没有运行新任务的 100k 正式训练。
 此前的边界报告、100k 结果、checkpoint 和视频保持为旧任务历史产物。
 
@@ -149,7 +151,7 @@ $env:MPLBACKEND = "Agg"
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.random_rollout --config configs/baseline_3a1c.yaml --seed 0 --episodes 3
-.\.venv\Scripts\python.exe outputs/point_defense_validation/validate_point_defense.py
+.\.venv\Scripts\python.exe outputs/v03_GoalDirected点防御/validation_20261024_point_defense/validate_point_defense.py
 ```
 
 | Random seed | Steps / 结局 | Team reward | 最小敌我距离 m | 最小基地距离 m | 终点基地距离 m | 碰撞步数 | Hard clips |
@@ -190,9 +192,9 @@ $env:MPLBACKEND = "Agg"
 本轮按照给定合成公式与原映射保留真实结果，没有私自加速度阻尼、速度跟踪、预测或换初态来掩盖问题。
 正式训练前应先确认 attacker 的到达控制定义；本报告不建议立即用当前模型启动新 100k。
 
-![完整随机回合 3D 轨迹](../outputs/point_defense_validation/default_random_seed0_trajectory_3d.png)
+![完整随机回合 3D 轨迹](../outputs/v03_GoalDirected点防御/validation_20261024_point_defense/default_random_seed0_trajectory_3d.png)
 
-![基地距离原始曲线，无平滑](../outputs/point_defense_validation/attacker_base_distance_raw.png)
+![基地距离原始曲线，无平滑](../outputs/v03_GoalDirected点防御/validation_20261024_point_defense/attacker_base_distance_raw.png)
 
 3D 图含基地、10 m 球、四机轨迹、起止点及真实结局、步数和两类距离，均已实际打开检查。
 后续 MAPPO smoke 的独立绘图入口也已运行，见 `smoke_visualization/trajectory_3d.png`。
@@ -202,10 +204,10 @@ $env:MPLBACKEND = "Agg"
 完成上述验证后，运行一次 **512 steps** 的短训练，除 CLI 总步数和输出目录外保留默认全部配置：
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 512 --output-dir outputs/point_defense_validation/smoke_train
-.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/point_defense_validation/smoke_train/checkpoints/final.pt --episodes 3 --output-dir outputs/point_defense_validation/smoke_evaluation_final
-.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/point_defense_validation/smoke_train/checkpoints/best.pt --episodes 3 --output-dir outputs/point_defense_validation/smoke_evaluation_best
-.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/point_defense_validation/smoke_train/checkpoints/final.pt --output-dir outputs/point_defense_validation/smoke_visualization
+.\.venv\Scripts\python.exe -m scripts.train_mappo --config configs/mappo_baseline.yaml --total-steps 512 --output-dir outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_train
+.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_train/checkpoints/final.pt --episodes 3 --output-dir outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_evaluation_final
+.\.venv\Scripts\python.exe -m scripts.evaluate_mappo --checkpoint outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_train/checkpoints/best.pt --episodes 3 --output-dir outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_evaluation_best
+.\.venv\Scripts\python.exe -m scripts.visualize_mappo --checkpoint outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_train/checkpoints/final.pt --output-dir outputs/v03_GoalDirected点防御/validation_20261024_point_defense/smoke_visualization
 ```
 
 CPU、seed 0；actor `[128,128]`、critic `[256,256]`、rollout 512、epochs 4、minibatch 64、
@@ -253,7 +255,7 @@ Final/best 各实际做 3 回合 deterministic evaluation，结果相同：
 | `tests/conftest.py`、`test_pursuit_env.py`、`test_evader_policy.py`、`test_boundary_steering.py`、`test_mappo.py`、`test_mappo_pipeline.py` | 新默认任务与独立 legacy 覆盖 |
 | `README.md`、`BASELINE_SPEC.md`、本报告 | 当前定义、运行方法、历史区别与实际限制 |
 
-产物全部位于 `outputs/point_defense_validation/`：有效 YAML、原始 NPZ、逐回合 CSV/JSON、
+产物全部位于 `outputs/v03_GoalDirected点防御/validation_20261024_point_defense/`：有效 YAML、原始 NPZ、逐回合 CSV/JSON、
 3D 图与未平滑距离曲线、受控终局检查、manifest、`implementation_audit.json`、
 smoke train/evaluation/visualization 和 `smoke_verification.json`。
 `envs/dynamics.py`、旧 `envs/evader_policy.py`、网络/PPO/buffer、训练 YAML 和 dynamics tests 未因本轮修改。

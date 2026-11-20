@@ -1,0 +1,21 @@
+evaluation_dir: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/best_test
+checkpoint: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/seed_1001/checkpoints/best.pt
+expected_checkpoint_sha256: 95f3ee35a1be51cba15e951115b552944b09284101f43f1d2ee7f9e010eecc0e
+expected_scenarios: 500
+expected_captures: 233
+expected_defense_failures: 267
+checkpoint_steps: 310000
+output_dir: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k/comparison/all_500_trajectories
+success_color: '#14834d'
+failure_color: '#c44436'
+pursuer_alpha: 0.22
+attacker_alpha: 0.13
+pursuer_line_width: 0.9
+attacker_line_width: 0.7
+global_padding_fraction: 0.04
+zoom_padding_m: 10.0
+dpi: 210
+overview_figure_inches: [18, 9]
+facets_figure_inches: [17, 15]
+three_d_figure_inches: [18, 9]
+font_family: Microsoft YaHei

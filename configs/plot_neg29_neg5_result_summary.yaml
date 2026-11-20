@@ -1,0 +1,12 @@
+experiment_dir: outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/负29至负5度独立测试
+output_subdir: result_summary
+expected_episodes: 500
+expected_checkpoint_steps: 310000
+grid_columns: 25
+success_color: '#15834c'
+failure_color: '#cb4d43'
+attacker_color: '#67ad86'
+pursuer_color: '#116b42'
+font_family: Microsoft YaHei
+figure_inches: [16, 10]
+dpi: 210

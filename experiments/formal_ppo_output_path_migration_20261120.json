@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "organized_on": "2026-11-20",
+  "repository": "E:\\projects\\research\\multi-uav-interception",
+  "meaning": "Original checkpoint/metadata/log/data paths are historical; resolve prefixes using this map.",
+  "moves": [
+    {
+      "old": "outputs/formal_ppo_v1/formal_20261116",
+      "new": "outputs/formal_ppo_v1/v14_单机PPO_原始奖励/01_从零训练至300k"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/formal_20261116_continuation_500k",
+      "new": "outputs/formal_ppo_v1/v14_单机PPO_原始奖励/02_续训至500k"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/analysis_20261117_coordinate_learning",
+      "new": "outputs/formal_ppo_v1/v14_单机PPO_原始奖励/分析/坐标与学习行为_20261117"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/reward_ab_best_so_far_300k_20261117",
+      "new": "outputs/formal_ppo_v1/v15_历史最小距离奖励/01_从零训练至300k"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/line_cost_k0p1_300k_20261117",
+      "new": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/01_从零训练至300k"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/line_cost_k0p1_seed1001_continuation_500k_20261119",
+      "new": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/02_Seed1001续训至500k"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/line_cost_best310k_full_circle_eval_20261119",
+      "new": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/全圆方向测试"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/line_cost_best310k_neg29_to_neg5_independent_500_20261119",
+      "new": "outputs/formal_ppo_v1/v16_线段偏离成本_k0p1/run01_seed1001/模型分析/best_310k/负29至负5度独立测试"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/active_near_beta_ab_300k_20261118",
+      "new": "outputs/formal_ppo_v1/v17_主动接近归因_k0p01/01_主动接近配比训练"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_near_reward_replay_20261117",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/01_普通距离差分"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_best_so_far_reward_replay_20261117",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/02_历史最小距离差分"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_best_so_far_beta_sweep_20261117",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/03_历史距离beta标定"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_line_cost_calibration_20261117",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/04_线段成本标定"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_active_near_replay_20261118",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/05_主动接近重放_首次"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_active_near_replay_20261118_002",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/05_主动接近重放_002"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_active_near_replay_20261118_003",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/05_主动接近重放_003"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/offline_active_near_calibration_20261118",
+      "new": "outputs/formal_ppo_v1/_离线奖励标定/06_主动接近与线段配比"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/_engineering_20261116",
+      "new": "outputs/formal_ppo_v1/_工程验收/01_初始工程测试"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/_normalization_confirmed_20261116",
+      "new": "outputs/formal_ppo_v1/_工程验收/02_归一化确认"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/formal_20261116_acceptance_smoke",
+      "new": "outputs/formal_ppo_v1/_工程验收/03_正式300k配置Smoke"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/_acceptance_confirmed_20261116",
+      "new": "outputs/formal_ppo_v1/_工程验收/04_正式训练验收"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/formal_20261116_continuation_500k_acceptance_smoke",
+      "new": "outputs/formal_ppo_v1/_工程验收/05_续训500k配置Smoke"
+    },
+    {
+      "old": "outputs/formal_ppo_v1/_extension_acceptance_20261116",
+      "new": "outputs/formal_ppo_v1/_工程验收/06_续训工程验收"
+    }
+  ]
+}

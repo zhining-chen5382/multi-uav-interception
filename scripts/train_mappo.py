@@ -11,7 +11,8 @@ import yaml
 from algorithms.mappo import MAPPOAgent, RolloutBuffer, build_input_scales
 from envs import PursuitEnv
 from utils.experiment import ROOT, load_training_config, set_seed, write_metadata
-from utils.evaluation import episode_outcome
+from utils.evaluation import REWARD_METRIC_FIELDS, episode_outcome, reward_episode_metrics
+from utils.post_training import run_post_training_analysis
 
 
 DEFAULT_CONFIG = ROOT / "configs" / "mappo_baseline.yaml"
@@ -24,7 +25,7 @@ EPISODE_FIELDS = (
     "interception_success", "enemy_attack_success", "attacker_reached_base",
     "interception_failure", "outcome", "distance_to_base", "interception_time",
     "interception_success_rate", "enemy_attack_success_rate", "timeout_rate",
-)
+) + REWARD_METRIC_FIELDS
 UPDATE_FIELDS = (
     "update", "env_steps", "episodes", "rollout_steps", "capture_rate",
     "mean_episode_reward", "actor_loss", "value_loss", "entropy", "approx_kl",
@@ -46,6 +47,7 @@ def _episode_start(info):
         "min_distance": float(info["min_distance"]),
         "collision_steps": 0,
         "pairwise_distance_sum": 0.0,
+        **reward_episode_metrics(info),
     }
 
 
@@ -62,6 +64,7 @@ def _accumulate_episode(episode, rewards, info, num_agents):
     pairs = np.triu_indices(num_agents, k=1)
     distances = np.linalg.norm(positions[pairs[0]] - positions[pairs[1]], axis=1)
     episode["pairwise_distance_sum"] += float(np.mean(distances))
+    episode.update(reward_episode_metrics(info))
     return reward
 
 
@@ -154,6 +157,8 @@ def train(config_path=DEFAULT_CONFIG, *, total_steps=None, output_dir=None, seed
             environment_rng_state=env.rng.bit_generator.state,
         )
 
+    # Preserve the real untrained policy for later trajectory evolution.
+    agent.save(checkpoint_path / "initial.pt", checkpoint_state(), metadata)
     with (output_path / "training_metrics.csv").open("w", newline="", encoding="utf-8") as episodes_file, \
             (output_path / "updates.csv").open("w", newline="", encoding="utf-8") as updates_file:
         episode_writer = csv.DictWriter(episodes_file, fieldnames=EPISODE_FIELDS)
@@ -210,6 +215,7 @@ def train(config_path=DEFAULT_CONFIG, *, total_steps=None, output_dir=None, seed
                         "collision_steps": episode["collision_steps"],
                         "collision_step_rate": episode["collision_steps"] / length,
                         "average_pairwise_pursuer_distance": episode["pairwise_distance_sum"] / length,
+                        **{name: episode[name] for name in REWARD_METRIC_FIELDS},
                     })
                     episodes_file.flush()
                     completed_this_update = True
@@ -264,6 +270,7 @@ def train(config_path=DEFAULT_CONFIG, *, total_steps=None, output_dir=None, seed
         print("No completed episodes: best.pt contains the final smoke-run policy.", flush=True)
     summary = dict(counters, output_dir=str(output_path), final_checkpoint=str(checkpoint_path / "final.pt"))
     print("Training completed: {}".format(summary), flush=True)
+    run_post_training_analysis(output_path, config)
     return summary
 
 

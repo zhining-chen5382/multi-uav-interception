@@ -47,6 +47,12 @@ def legacy_config(baseline_config):
         "evader_velocity": [0.0, 0.0, 0.0],
     }
     config["reward"].pop("attack_failure_penalty", None)
+    # Historical pursuit snapshots use the old, mutually exclusive reward
+    # schema; deriving other physical values from the default must not silently
+    # migrate those regression scenarios to point-defense shaping.
+    config["reward"].pop("active_progress_coefficient", None)
+    config["reward"].pop("survival_penalty_per_second", None)
+    config["reward"].update(progress_coefficient=1.0, time_penalty=-0.01)
     return config
 
 
